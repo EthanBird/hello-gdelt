@@ -189,3 +189,16 @@ M0 → M1 → M2 → M3 → M4 → M5 → M6 → M7 → M8
 3. M2 完成前不开发模型；
 4. M4 数据契约稳定前不公开 MCP；
 5. M5 基线不能稳定复现时，不进入自动假设发现。
+
+## 8. 进度快照（2026-07-16）
+
+| 项目 | 状态 | 证据 |
+|---|---|---|
+| M0 文档与仓库治理 | In review | README、AGENTS、CONTRIBUTING、ADR、PR/Issue 模板 |
+| 环境预检 | Implemented | Python/依赖/磁盘/SQLite WAL/FTS5 检查与测试 |
+| 真实 GDELT probe | Implemented | HTTPS→HTTP 可观测回退、完整批次选择、四重校验 |
+| Bronze/Silver/Gold 最小闭环 | Implemented | 真实 Events 批次产生三层 Parquet 与 SQLite lineage |
+| 自动化质量检查 | Implemented | Ruff 与 7 个 pytest 测试通过 |
+| 目标机器最终 GO 报告 | Pending | 必须在 1TB/32GB/Ryzen 目标机执行默认 500GB 门槛 |
+
+本开发环境的成功只证明代码路径可运行，不代替目标机器上的 PLAN-006 决策。
