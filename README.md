@@ -6,12 +6,13 @@
 
 ## 当前状态
 
-当前为 `v0.1 / 设计基线阶段`：
+当前为 `v0.1 / M1 验证基础开发阶段`：
 
 - 已完成数学建模定义；
 - 已完成单机工程架构设计；
 - 已完成开发前验证方案；
-- 尚未宣称任何数据接入、指标或模型已经实现；
+- 已在开发分支实现环境预检、真实批次探测、下载校验和最小三层管线；
+- 指标模型、Hypothesis Lab 与 MCP 尚未实现；
 - 正式开发必须先通过开发前 `GO / CONDITIONAL GO / NO-GO` 门禁。
 
 ## V1 目标
@@ -85,6 +86,31 @@ GDELT sample
 ```
 
 必须满足的 GO 条件包括：核心依赖可安装、GDELT raw 可访问、至少一个事件文件可下载解压、Parquet 可写、DuckDB 可查、SQLite WAL/FTS5 可用、端到端样本能生成 Gold 表。BigQuery、LanceDB 或 DOC API 暂不可用可判定为 `CONDITIONAL GO`，但必须记录风险。
+
+## 开发快速开始
+
+推荐 Python 3.11；当前代码同时在 Python 3.12 开发环境通过测试。
+
+```bash
+python3.11 -m venv --copies .venv
+.venv/bin/pip install -e '.[dev]'
+.venv/bin/ruff check .
+.venv/bin/pytest
+```
+
+真实数据验证采用 HTTPS-first；若官方 HTTPS 不可用，可显式允许 HTTP 回退。HTTP 回退会写入安全警告，并仍强制检查官方大小、MD5、ZIP 结构和字段数：
+
+```bash
+hello-gdelt preflight --data-root data
+hello-gdelt probe \
+  --allow-http-fallback \
+  --output data/reports/diagnostics/source_probe.json
+hello-gdelt pipeline data/tmp/downloads/<batch>.export.CSV.zip \
+  --output data/reports/diagnostics/pipeline.json
+hello-gdelt serve
+```
+
+所有下载、Parquet、SQLite 和本机诊断报告位于 `data/`，不会提交 Git。
 
 ## 工作方式
 
