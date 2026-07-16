@@ -1,0 +1,53 @@
+name: Development task
+description: Implement a bounded task from the approved milestone backlog
+title: "[Task] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Link this issue to a milestone and keep the scope independently testable.
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone
+      placeholder: M1 / M2 / ...
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Intended outcome
+      description: Describe the observable result, not only implementation steps.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and non-scope
+      description: State what is included and explicitly excluded.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: |
+        - [ ] Contract/schema is defined
+        - [ ] Normal, boundary and failure tests pass
+        - [ ] Resource limits are documented
+        - [ ] Reproduction evidence is attached
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and risks
+      description: Link blocking issues and list data, network, resource or modeling risks.
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification command or evidence
+      description: Give the command, query, report, or artifact that proves completion.
+    validations:
+      required: true
