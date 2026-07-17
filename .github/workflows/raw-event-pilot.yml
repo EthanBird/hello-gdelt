@@ -5,6 +5,7 @@ on:
     branches: ["research/**"]
     paths:
       - "research/global_news_markets/run_raw_event_pilot.py"
+      - "research/global_news_markets/run_raw_event_pilot_v2.py"
       - "research/global_news_markets/raw_event_pilot_protocol.md"
       - ".github/workflows/raw-event-pilot.yml"
   workflow_dispatch:
@@ -32,7 +33,7 @@ jobs:
         run: |
           mkdir -p raw_event_output
           set +e
-          python research/global_news_markets/run_raw_event_pilot.py \
+          python research/global_news_markets/run_raw_event_pilot_v2.py \
             --start 2025-07-18 --end 2025-07-31 \
             --output raw_event_output > raw_event_output/run.log 2>&1
           status=$?
