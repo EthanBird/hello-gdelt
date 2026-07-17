@@ -10,6 +10,10 @@ from hello_gdelt.validation.ecb_fx_sample import (
     run_ecb_fx_sample,
     write_ecb_fx_sample_report,
 )
+from hello_gdelt.validation.gdelt_history_plan import (
+    run_gdelt_history_plan,
+    write_gdelt_history_plan_report,
+)
 from hello_gdelt.validation.gdelt_sample import (
     run_gdelt_latest_sample,
     write_gdelt_sample_report,
@@ -61,6 +65,46 @@ def gdelt_sample(
         allow_insecure_http=allow_insecure_http,
     )
     json_path, markdown_path = write_gdelt_sample_report(report, root / "reports")
+    typer.echo(report.to_markdown())
+    typer.echo(f"JSON: {json_path}")
+    typer.echo(f"Markdown: {markdown_path}")
+    raise typer.Exit(code=0 if report.gate == "GO" else 2)
+
+
+@app.command("gdelt-history-plan")
+def gdelt_history_plan(
+    start_timestamp: str = typer.Option(
+        ...,
+        help="Inclusive 14-digit GDELT timestamp",
+    ),
+    end_timestamp: str = typer.Option(
+        ...,
+        help="Inclusive 14-digit GDELT timestamp",
+    ),
+    root: Path = typer.Option(Path.cwd(), help="Repository/runtime root"),
+    max_download_mb: int = typer.Option(20_000, min=1, max=200_000),
+    max_trios: int = typer.Option(96, min=1, max=100_000),
+    allow_insecure_http: bool = typer.Option(
+        False,
+        help="Explicitly allow legacy HTTP for the GDELT historical catalogue",
+    ),
+    refresh_manifest: bool = typer.Option(
+        True,
+        help="Refresh the append-only master catalogue before planning",
+    ),
+) -> None:
+    """Create a bounded, audited historical GDELT download plan."""
+
+    report = run_gdelt_history_plan(
+        root,
+        start_timestamp=start_timestamp,
+        end_timestamp=end_timestamp,
+        max_compressed_bytes=max_download_mb * 1_000_000,
+        max_trios=max_trios,
+        allow_insecure_http=allow_insecure_http,
+        refresh_manifest=refresh_manifest,
+    )
+    json_path, markdown_path = write_gdelt_history_plan_report(report, root / "reports")
     typer.echo(report.to_markdown())
     typer.echo(f"JSON: {json_path}")
     typer.echo(f"Markdown: {markdown_path}")
