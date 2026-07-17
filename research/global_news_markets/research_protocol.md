@@ -1,8 +1,25 @@
 # 全球新闻—多市场研究：Stage 1 预注册协议
 
-版本：v1.0-pre-results  
-冻结窗口：2025-07-18 至 2026-07-16  
-数据源：GDELT DOC 2.0 API；Yahoo Finance 公共历史接口（由 yfinance 调用，仅作为首轮可行性数据源）
+版本：v1.1-source-audit-amendment  
+原冻结窗口：2025-07-18 至 2026-07-16  
+原设计数据源：GDELT DOC 2.0 API；Yahoo Finance 公共历史接口（由 yfinance 调用，仅作为首轮可行性数据源）
+
+## 0. 协议修订记录
+
+v1.0 在查看任何市场检验结果前冻结。真实接入后发现两项阻断：
+
+1. 当前 GDELT DOC 2.0 官方说明将精确 STARTDATETIME/ENDDATETIME 搜索限制在滚动近三个月，不能支撑原计划的一年样本，更不能用于 2015—2026 历史研究；
+2. GitHub Hosted Runner 共享出口连续收到 HTTP 429，即使简化为单关键词、12 秒间隔和显式退避，仍无法稳定完成九主题抓取。
+
+因此 v1.0 的 DOC API 一年期确认性研究在产生任何回归结果前被正式标记为 `DATA_SOURCE_BLOCKED`，不得缩短样本后继续沿用原先 n≥120 的裁决规则，也不得把第三方整理面板冒充原始 DOC API 结果。
+
+后续正式历史研究改用：
+
+- GDELT 2.0 原始 Events / EventMentions / GKG 15分钟文件；
+- 或受成本控制、快照可追溯的 BigQuery 抽取；
+- DOC API 仅用于近三个月关键词探索和候选主题验证。
+
+保留下文作为原始 v1.0 设计记录，便于审计为什么该路径被撤回。
 
 ## 研究目的
 
@@ -57,5 +74,5 @@
 - Yahoo Finance 与连续期货代码只作为 Stage 1 可行性代理，不代表交易所官方结算序列；
 - `GLD` 仅为黄金现货暴露代理，不是 LBMA Gold Price；
 - 期货连续序列的换月与展期将在后续使用可审计构造器重建；
-- DOC API 最长一年，使本阶段统计功效有限；后续历史研究使用 GDELT raw/BigQuery；
+- DOC API 当前仅适合滚动近三个月，原一年设计已撤回；历史研究必须使用 raw/BigQuery；
 - 日频 UTC 对齐无法识别市场会话内因果顺序。
