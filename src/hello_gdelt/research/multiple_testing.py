@@ -48,7 +48,7 @@ def benjamini_hochberg(p_values: tuple[float, ...]) -> tuple[float, ...]:
     adjusted_sorted = [1.0] * count
     running = 1.0
     for reverse_rank in range(count - 1, -1, -1):
-        original_index, p_value = ranked[reverse_rank]
+        _, p_value = ranked[reverse_rank]
         rank = reverse_rank + 1
         candidate = min(1.0, p_value * count / rank)
         running = min(running, candidate)
