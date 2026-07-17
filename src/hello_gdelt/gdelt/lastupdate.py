@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 
 
 class LastUpdateParseError(ValueError):
-    """Raised when GDELT lastupdate.txt does not satisfy the expected contract."""
+    """Raised when a GDELT manifest does not satisfy the expected contract."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,42 +35,43 @@ def _classify(filename: str) -> tuple[str, str]:
     return dataset, timestamp
 
 
-def parse_lastupdate(text: str) -> tuple[GdeltArtifact, ...]:
-    artifacts: list[GdeltArtifact] = []
-    for line_number, raw_line in enumerate(text.splitlines(), start=1):
-        line = raw_line.strip()
-        if not line:
-            continue
-        parts = line.split()
-        if len(parts) != 3:
-            raise LastUpdateParseError(
-                f"line {line_number}: expected '<size> <md5> <url>', got {len(parts)} fields"
-            )
-        size_raw, md5, url = parts
-        try:
-            size_bytes = int(size_raw)
-        except ValueError as exc:
-            raise LastUpdateParseError(f"line {line_number}: invalid byte size") from exc
-        if size_bytes <= 0:
-            raise LastUpdateParseError(f"line {line_number}: size must be positive")
-        if len(md5) != 32 or any(ch not in "0123456789abcdefABCDEF" for ch in md5):
-            raise LastUpdateParseError(f"line {line_number}: invalid MD5")
-        parsed = urlparse(url)
-        if parsed.scheme not in {"http", "https"}:
-            raise LastUpdateParseError(f"line {line_number}: URL must be HTTP(S)")
-        if parsed.hostname not in {"data.gdeltproject.org", "www.gdeltproject.org"}:
-            raise LastUpdateParseError(f"line {line_number}: unexpected host {parsed.hostname}")
-        dataset, timestamp = _classify(parsed.path)
-        artifacts.append(
-            GdeltArtifact(
-                size_bytes=size_bytes,
-                md5=md5.lower(),
-                url=url,
-                dataset=dataset,
-                timestamp=timestamp,
-            )
+def parse_artifact_line(raw_line: str, *, line_number: int = 1) -> GdeltArtifact:
+    line = raw_line.strip()
+    parts = line.split()
+    if len(parts) != 3:
+        raise LastUpdateParseError(
+            f"line {line_number}: expected '<size> <md5> <url>', got {len(parts)} fields"
         )
+    size_raw, md5, url = parts
+    try:
+        size_bytes = int(size_raw)
+    except ValueError as exc:
+        raise LastUpdateParseError(f"line {line_number}: invalid byte size") from exc
+    if size_bytes <= 0:
+        raise LastUpdateParseError(f"line {line_number}: size must be positive")
+    if len(md5) != 32 or any(ch not in "0123456789abcdefABCDEF" for ch in md5):
+        raise LastUpdateParseError(f"line {line_number}: invalid MD5")
+    parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"}:
+        raise LastUpdateParseError(f"line {line_number}: URL must be HTTP(S)")
+    if parsed.hostname not in {"data.gdeltproject.org", "www.gdeltproject.org"}:
+        raise LastUpdateParseError(f"line {line_number}: unexpected host {parsed.hostname}")
+    dataset, timestamp = _classify(parsed.path)
+    return GdeltArtifact(
+        size_bytes=size_bytes,
+        md5=md5.lower(),
+        url=url,
+        dataset=dataset,
+        timestamp=timestamp,
+    )
 
+
+def parse_lastupdate(text: str) -> tuple[GdeltArtifact, ...]:
+    artifacts = [
+        parse_artifact_line(raw_line, line_number=line_number)
+        for line_number, raw_line in enumerate(text.splitlines(), start=1)
+        if raw_line.strip()
+    ]
     if not artifacts:
         raise LastUpdateParseError("lastupdate.txt contained no artifacts")
     datasets = {item.dataset for item in artifacts}
@@ -80,4 +81,6 @@ def parse_lastupdate(text: str) -> tuple[GdeltArtifact, ...]:
     timestamps = {item.timestamp for item in artifacts}
     if len(timestamps) != 1:
         raise LastUpdateParseError(f"artifacts are not aligned to one timestamp: {sorted(timestamps)}")
+    if len(artifacts) != 3:
+        raise LastUpdateParseError(f"lastupdate.txt expected exactly 3 artifacts, got {len(artifacts)}")
     return tuple(sorted(artifacts, key=lambda item: item.dataset))
