@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
 
 import pytest
@@ -53,7 +54,7 @@ def test_daily_bar_validation_rejects_pre_close_availability() -> None:
 
 def test_daily_bar_validation_rejects_inconsistent_ohlc() -> None:
     item = bar(date(2026, 7, 16), open_price=100.0, close_price=101.0)
-    invalid = DailyBar(**{**item.__dict__, "high": 99.0})
+    invalid = replace(item, high=99.0)
     with pytest.raises(DailyMarketDataError, match="OHLC range is inconsistent"):
         validate_daily_bars((invalid,))
 
