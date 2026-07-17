@@ -38,7 +38,7 @@ jobs:
         run: |
           mkdir -p research_output_global_market
           set +e
-          python research/global_market_pilot/run_pilot_fast.py \
+          python research/global_market_pilot/run_pilot_resilient.py \
             > research_output_global_market/run.log 2>&1
           status=$?
           echo "$status" > research_output_global_market/exit_code.txt
