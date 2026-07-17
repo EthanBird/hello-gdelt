@@ -69,3 +69,17 @@ def test_explicit_holiday_snapshot_and_early_close() -> None:
     open_dt, close_dt = calendar.session_bounds_local(date(2026, 1, 2))
     assert open_dt.hour == 9
     assert close_dt.hour == 13
+
+
+def test_sse_midday_break_reacts_at_afternoon_reopen() -> None:
+    calendar = get_market_calendar("XSHG")
+    aligned = calendar.align_news_timestamp(datetime(2026, 7, 20, 4, 0, tzinfo=timezone.utc))
+    assert aligned.observed_session is SessionLabel.MIDDAY_BREAK
+    assert aligned.reaction_trading_date == date(2026, 7, 20)
+    assert aligned.reaction_start_utc == datetime(2026, 7, 20, 5, 0, tzinfo=timezone.utc)
+
+
+def test_cme_weekend_is_closed_not_maintenance() -> None:
+    calendar = get_market_calendar("XCME")
+    observed = calendar.classify(datetime(2026, 7, 18, 18, 0, tzinfo=timezone.utc))
+    assert observed is SessionLabel.CLOSED
