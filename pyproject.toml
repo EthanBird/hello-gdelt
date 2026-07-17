@@ -51,4 +51,5 @@ ignore = ["UP017"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
+allow_redefinition = true
 packages = ["hello_gdelt"]
