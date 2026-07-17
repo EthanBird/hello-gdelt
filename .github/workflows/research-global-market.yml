@@ -9,12 +9,6 @@ on:
       - "configs/research/**"
       - "src/hello_gdelt/hypothesis/statistics.py"
       - ".github/workflows/research-global-market.yml"
-  pull_request:
-    paths:
-      - "research/global_market_pilot/**"
-      - "configs/research/**"
-      - "src/hello_gdelt/hypothesis/statistics.py"
-      - ".github/workflows/research-global-market.yml"
 
 concurrency:
   group: gdelt-global-market-${{ github.ref }}
