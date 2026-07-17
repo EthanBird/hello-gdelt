@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "research_window": {"start": "2025-07-01", "end": "2026-06-30"},
+  "notes": [
+    "This is the first real-data pilot universe, not the final 100-page report universe.",
+    "Yahoo Finance symbols are used only as a reproducible public-data pilot and are classified as C-grade research inputs.",
+    "London spot series must be labelled as proxy unless a licensed benchmark is supplied."
+  ],
+  "assets": [
+    {"asset_id": "CSI300", "symbol": "000300.SS", "market": "CN_EQ_INDEX", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "沪深300"},
+    {"asset_id": "SSE_COMP", "symbol": "000001.SS", "market": "CN_EQ_INDEX", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "上证综指"},
+    {"asset_id": "CHINEXT", "symbol": "399006.SZ", "market": "CN_EQ_INDEX", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "创业板指"},
+    {"asset_id": "MOUTAI", "symbol": "600519.SS", "market": "CN_EQ_STOCK", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "贵州茅台"},
+    {"asset_id": "CATL", "symbol": "300750.SZ", "market": "CN_EQ_STOCK", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "宁德时代"},
+    {"asset_id": "PING_AN", "symbol": "601318.SS", "market": "CN_EQ_STOCK", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "中国平安"},
+    {"asset_id": "NIKKEI225", "symbol": "^N225", "market": "JP_EQ_INDEX", "timezone": "Asia/Tokyo", "currency": "JPY", "label_zh": "日经225"},
+    {"asset_id": "TOYOTA", "symbol": "7203.T", "market": "JP_EQ_STOCK", "timezone": "Asia/Tokyo", "currency": "JPY", "label_zh": "丰田汽车"},
+    {"asset_id": "SONY", "symbol": "6758.T", "market": "JP_EQ_STOCK", "timezone": "Asia/Tokyo", "currency": "JPY", "label_zh": "索尼集团"},
+    {"asset_id": "KOSPI", "symbol": "^KS11", "market": "KR_EQ_INDEX", "timezone": "Asia/Seoul", "currency": "KRW", "label_zh": "KOSPI"},
+    {"asset_id": "SAMSUNG", "symbol": "005930.KS", "market": "KR_EQ_STOCK", "timezone": "Asia/Seoul", "currency": "KRW", "label_zh": "三星电子"},
+    {"asset_id": "SK_HYNIX", "symbol": "000660.KS", "market": "KR_EQ_STOCK", "timezone": "Asia/Seoul", "currency": "KRW", "label_zh": "SK海力士"},
+    {"asset_id": "SP500", "symbol": "^GSPC", "market": "US_EQ_INDEX", "timezone": "America/New_York", "currency": "USD", "label_zh": "标普500"},
+    {"asset_id": "NASDAQ100", "symbol": "^NDX", "market": "US_EQ_INDEX", "timezone": "America/New_York", "currency": "USD", "label_zh": "纳斯达克100"},
+    {"asset_id": "AAPL", "symbol": "AAPL", "market": "US_EQ_STOCK", "timezone": "America/New_York", "currency": "USD", "label_zh": "苹果"},
+    {"asset_id": "NVDA", "symbol": "NVDA", "market": "US_EQ_STOCK", "timezone": "America/New_York", "currency": "USD", "label_zh": "英伟达"},
+    {"asset_id": "XLE", "symbol": "XLE", "market": "US_EQ_ETF", "timezone": "America/New_York", "currency": "USD", "label_zh": "美国能源行业ETF"},
+    {"asset_id": "ES", "symbol": "ES=F", "market": "CME_FUTURE", "timezone": "America/Chicago", "currency": "USD", "label_zh": "E-mini标普500期货"},
+    {"asset_id": "NQ", "symbol": "NQ=F", "market": "CME_FUTURE", "timezone": "America/Chicago", "currency": "USD", "label_zh": "纳斯达克100期货"},
+    {"asset_id": "CL", "symbol": "CL=F", "market": "CME_FUTURE", "timezone": "America/Chicago", "currency": "USD", "label_zh": "WTI原油期货"},
+    {"asset_id": "GC", "symbol": "GC=F", "market": "CME_FUTURE", "timezone": "America/Chicago", "currency": "USD", "label_zh": "COMEX黄金期货"},
+    {"asset_id": "HG", "symbol": "HG=F", "market": "CME_FUTURE", "timezone": "America/Chicago", "currency": "USD", "label_zh": "COMEX铜期货"},
+    {"asset_id": "XAUUSD_PROXY", "symbol": "XAUUSD=X", "fallback_symbol": "GC=F", "market": "LONDON_SPOT_PROXY", "timezone": "Europe/London", "currency": "USD", "label_zh": "伦敦黄金现货代理"},
+    {"asset_id": "EURUSD", "symbol": "EURUSD=X", "market": "FX", "timezone": "UTC", "currency": "USD", "label_zh": "欧元兑美元"},
+    {"asset_id": "USDJPY", "symbol": "JPY=X", "market": "FX", "timezone": "UTC", "currency": "JPY", "label_zh": "美元兑日元"},
+    {"asset_id": "USDKRW", "symbol": "KRW=X", "market": "FX", "timezone": "UTC", "currency": "KRW", "label_zh": "美元兑韩元"},
+    {"asset_id": "USDCNY", "symbol": "CNY=X", "market": "FX", "timezone": "UTC", "currency": "CNY", "label_zh": "美元兑人民币"}
+  ]
+}
