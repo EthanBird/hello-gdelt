@@ -9,12 +9,12 @@
   "notes": [
     "This is the first real-data pilot universe, not the final 100-page report universe.",
     "Yahoo Finance symbols are used only as a reproducible public-data pilot and are classified as C-grade research inputs.",
-    "London spot series must be labelled as proxy unless a licensed benchmark is supplied."
+    "London spot series and index fallbacks must be labelled as proxies unless a licensed benchmark is supplied."
   ],
   "assets": [
     {"asset_id": "CSI300", "symbol": "000300.SS", "market": "CN_EQ_INDEX", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "沪深300"},
     {"asset_id": "SSE_COMP", "symbol": "000001.SS", "market": "CN_EQ_INDEX", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "上证综指"},
-    {"asset_id": "CHINEXT", "symbol": "399006.SZ", "market": "CN_EQ_INDEX", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "创业板指"},
+    {"asset_id": "CHINEXT", "symbol": "399006.SZ", "fallback_symbol": "159915.SZ", "market": "CN_EQ_INDEX_PROXY", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "创业板指/ETF代理"},
     {"asset_id": "MOUTAI", "symbol": "600519.SS", "market": "CN_EQ_STOCK", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "贵州茅台"},
     {"asset_id": "CATL", "symbol": "300750.SZ", "market": "CN_EQ_STOCK", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "宁德时代"},
     {"asset_id": "PING_AN", "symbol": "601318.SS", "market": "CN_EQ_STOCK", "timezone": "Asia/Shanghai", "currency": "CNY", "label_zh": "中国平安"},
