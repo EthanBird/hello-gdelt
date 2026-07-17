@@ -10,6 +10,7 @@ from typing import Any, Literal
 import httpx
 
 from hello_gdelt.config import Paths, ResourceLimits
+from hello_gdelt.control.manifest import ManifestStore
 from hello_gdelt.gdelt.bronze import BronzeReceipt, write_bronze_parquet
 from hello_gdelt.gdelt.download import (
     download_artifact,
@@ -144,6 +145,22 @@ def _dataset_result(
     )
 
 
+def _begin_or_recover_attempt(store: ManifestStore, source_url: str) -> bool:
+    record = store.get(source_url)
+    if record is None:
+        raise RuntimeError(f"artifact was not registered: {source_url}")
+    if record.status == "BRONZE_READY":
+        return True
+    if record.status not in {"DISCOVERED", "FAILED"}:
+        store.transition(
+            source_url,
+            "FAILED",
+            error=f"recovering incomplete prior state: {record.status}",
+        )
+    store.transition(source_url, "DOWNLOADING")
+    return False
+
+
 def run_gdelt_latest_sample(
     root: Path,
     *,
@@ -192,48 +209,81 @@ def run_gdelt_latest_sample(
             raw_root = paths.data / "raw" / "gdelt" / "v2" / source_timestamp
             archive_dir = raw_root / "archives"
             extracted_dir = raw_root / "extracted"
-            for artifact in artifacts:
-                receipt = download_artifact(
-                    client,
-                    artifact,
-                    archive_dir,
-                    limits=limits,
-                )
-                extracted = extract_single_member_zip(
-                    receipt.path,
-                    extracted_dir,
-                    max_uncompressed_bytes=min(
-                        max(limits.max_download_bytes * 20, 1),
-                        10_000_000_000,
-                    ),
-                )
-                validation = validate_tsv_file(
-                    artifact.dataset,
-                    extracted,
-                    max_rows=sample_rows,
-                )
-                if not validation.passed:
-                    raise RuntimeError(
-                        f"GDELT {artifact.dataset} schema sample failed: {validation}"
-                    )
-                bronze = write_bronze_parquet(
-                    extracted,
-                    paths.data,
-                    artifact,
-                )
-                results.append(
-                    _dataset_result(
-                        artifact.dataset,
-                        validation,
-                        bronze,
-                        receipt.path,
-                        extracted,
-                        receipt.size_bytes,
-                        receipt.md5,
-                        receipt.sha256,
-                        receipt.reused,
-                    )
-                )
+            control_path = paths.data / "control" / "hello_gdelt.sqlite3"
+            with ManifestStore(control_path) as store:
+                store.register(artifacts)
+                for artifact in artifacts:
+                    already_ready = _begin_or_recover_attempt(store, artifact.url)
+                    try:
+                        receipt = download_artifact(
+                            client,
+                            artifact,
+                            archive_dir,
+                            limits=limits,
+                        )
+                        if not already_ready:
+                            store.transition(
+                                artifact.url,
+                                "VERIFIED",
+                                local_archive_path=receipt.path,
+                                actual_sha256=receipt.sha256,
+                            )
+                        extracted = extract_single_member_zip(
+                            receipt.path,
+                            extracted_dir,
+                            max_uncompressed_bytes=min(
+                                max(limits.max_download_bytes * 20, 1),
+                                10_000_000_000,
+                            ),
+                        )
+                        if not already_ready:
+                            store.transition(
+                                artifact.url,
+                                "EXTRACTED",
+                                local_extracted_path=extracted,
+                            )
+                        validation = validate_tsv_file(
+                            artifact.dataset,
+                            extracted,
+                            max_rows=sample_rows,
+                        )
+                        if not validation.passed:
+                            raise RuntimeError(
+                                f"GDELT {artifact.dataset} schema sample failed: {validation}"
+                            )
+                        bronze = write_bronze_parquet(
+                            extracted,
+                            paths.data,
+                            artifact,
+                        )
+                        if not already_ready:
+                            store.transition(
+                                artifact.url,
+                                "BRONZE_READY",
+                                bronze_path=Path(bronze.parquet_path),
+                            )
+                        results.append(
+                            _dataset_result(
+                                artifact.dataset,
+                                validation,
+                                bronze,
+                                receipt.path,
+                                extracted,
+                                receipt.size_bytes,
+                                receipt.md5,
+                                receipt.sha256,
+                                receipt.reused,
+                            )
+                        )
+                    except Exception as artifact_error:
+                        record = store.get(artifact.url)
+                        if record is not None and record.status not in {"FAILED", "BRONZE_READY"}:
+                            store.transition(
+                                artifact.url,
+                                "FAILED",
+                                error=f"{type(artifact_error).__name__}: {artifact_error}",
+                            )
+                        raise
         return GdeltSampleReport(
             generated_at_utc=generated_at,
             gate="GO",
