@@ -16,6 +16,10 @@ on:
       - "src/hello_gdelt/hypothesis/statistics.py"
       - ".github/workflows/research-global-market.yml"
 
+concurrency:
+  group: gdelt-global-market-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
