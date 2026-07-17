@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "claim": "Higher media-observed financial stress predicts local-currency depreciation against the US dollar.",
+  "universe": {
+    "entity_type": "country",
+    "start_date": "2018-01-01",
+    "end_date": "2026-06-30",
+    "entities": ["BRA", "MEX", "ZAF", "TUR"]
+  },
+  "feature": {
+    "feature_id": "financial_stress_narrative",
+    "transform": "exposure_adjusted_zscore",
+    "window_days": 7,
+    "lag_days": 1
+  },
+  "target": {
+    "target_id": "fx_return_usd",
+    "horizon_days": 5
+  },
+  "model": {
+    "type": "panel_ols",
+    "controls": ["vix", "dxy", "rate_differential"],
+    "fixed_effects": ["entity"]
+  },
+  "expected_sign": "negative",
+  "validation": {
+    "method": "walk_forward",
+    "min_train_periods": 500,
+    "test_periods": 60,
+    "step_periods": 20,
+    "min_observations": 2000
+  },
+  "robustness": {
+    "placebos": ["shuffle_date", "shuffle_entity", "random_feature"],
+    "placebo_repeats": 20,
+    "random_seed": 20260717,
+    "alternative_windows": [14, 30]
+  },
+  "decision_rule": {
+    "max_q_value": 0.05,
+    "min_effect_abs": 0.0,
+    "min_fold_sign_agreement": 0.7,
+    "min_oos_r2": 0.0,
+    "require_placebo_outperformance": true
+  },
+  "resource_budget": {
+    "max_rows": 2000000,
+    "max_entities": 80,
+    "max_runtime_seconds": 1800,
+    "max_memory_mb": 8192
+  },
+  "tags": ["financial_stress", "fx", "emerging_markets"]
+}
