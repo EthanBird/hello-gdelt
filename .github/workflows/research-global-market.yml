@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   global-market-pilot:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
