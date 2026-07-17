@@ -1,0 +1,128 @@
+{
+  "version": "2026-07-17-v2",
+  "status_vocabulary": [
+    "SUPPORTED",
+    "REJECTED",
+    "INCONCLUSIVE",
+    "DATA_INSUFFICIENT",
+    "DATA_SOURCE_BLOCKED",
+    "PENDING"
+  ],
+  "evidence": [
+    {
+      "id": "SOURCE-DOC-001",
+      "title": "GDELT DOC API one-year stage-1 path",
+      "class": "data_source_audit",
+      "status": "DATA_SOURCE_BLOCKED",
+      "reason": "Current official DOC documentation limits precise date search to a rolling three-month window; GitHub Hosted Runner also returned persistent HTTP 429 before any regression result was generated.",
+      "artifacts": [
+        "research/global_news_markets/research_protocol.md",
+        "research/global_news_markets/run_stage1_rate_limited.py"
+      ]
+    },
+    {
+      "id": "FX-INR-001",
+      "title": "GDELT Goldstein/Tone/mentions and next-day USD/INR",
+      "class": "external_replication",
+      "status": "INCONCLUSIVE",
+      "sample": "2025-01-02/2025-12-24, 252 panel days, 238 regression observations",
+      "tests": 3,
+      "supported": 0,
+      "source_sha256": "4d7d6e464003123f5250928c1bb04df373c8310c5207ae2712518860b29a09fc",
+      "key_result": "Tone passed the circular-shift placebo at p≈0.0495 and had 100% fold sign stability, but BH q≈0.3945 and OOS RMSE deteriorated by≈3.43%.",
+      "artifacts": [
+        "research/global_news_markets/results/india_fx_external_replication_v1.md",
+        "research/global_news_markets/run_india_fx_replication_v2.py"
+      ]
+    },
+    {
+      "id": "MULTI-MACRO-001",
+      "title": "Ten GDELT news states and five macro assets",
+      "class": "external_multi_asset_validation",
+      "status": "INCONCLUSIVE",
+      "sample": "2019-01-02/2026-01-15, 1,825 daily rows",
+      "tests": 200,
+      "nominal_p_lt_005": 6,
+      "fdr_q_lt_005": 0,
+      "supported": 0,
+      "source_sha256": "399d05f9f294124b2f1952e6494c2a91c0069ca147068d7fcbbbe8fe800a799e",
+      "key_result": "Six apparent relations vanish under family-level FDR and the full placebo/OOS/stability gate.",
+      "artifacts": [
+        "research/global_news_markets/master_panel_protocol.md",
+        "research/global_news_markets/results/master_panel_external_validation_v1.md",
+        "research/global_news_markets/run_master_panel_core.py"
+      ]
+    },
+    {
+      "id": "DXY-AUDIT-001",
+      "title": "Post-selection audit of US mentions to DXY five-day return",
+      "class": "exploratory_counterexample",
+      "status": "INCONCLUSIVE",
+      "key_result": "The nominal candidate is period-dependent, non-monotonic by decile and supported by only six non-overlapping z≥2 events whose matched-control interval crosses zero.",
+      "artifacts": [
+        "research/global_news_markets/results/dxy_mentions_candidate_audit.md"
+      ]
+    },
+    {
+      "id": "LP-001",
+      "title": "One-to-twenty-day local projection exploration",
+      "class": "exploratory_dynamic_response",
+      "status": "INCONCLUSIVE",
+      "tests": 800,
+      "nominal_p_lt_005": 31,
+      "fdr_q_lt_005": 0,
+      "key_result": "No horizon coefficient survives feature-family or target-global FDR.",
+      "artifacts": [
+        "research/global_news_markets/results/local_projection_exploration_v1.md"
+      ]
+    },
+    {
+      "id": "LAG-001",
+      "title": "Bidirectional news-market lag exploration",
+      "class": "exploratory_directionality",
+      "status": "INCONCLUSIVE",
+      "tests": 500,
+      "nominal_news_to_market": 16,
+      "nominal_market_to_news": 8,
+      "fdr_q_lt_005": 0,
+      "key_result": "Neither direction has a relation surviving direction-family FDR.",
+      "artifacts": [
+        "research/global_news_markets/results/bidirectional_lag_exploration_v1.md"
+      ]
+    },
+    {
+      "id": "GLOBAL-NULL-001",
+      "title": "Significance enrichment diagnostic across 1,500 tests",
+      "class": "meta_research_diagnostic",
+      "status": "INCONCLUSIVE",
+      "tests": 1500,
+      "nominal_p_lt_005": 61,
+      "null_expected_at_005": 75,
+      "fdr_q_lt_005": 0,
+      "key_result": "Nominal significance is not enriched beyond the global-null expectation; none of 200 preregistered tests passes the unadjusted joint placebo/OOS/stability gate.",
+      "artifact_sha256": "733578405b6fa83a8d27e54c58d2bd8483a784afd5d4f2163e61f68b33672d81",
+      "artifacts": [
+        "research/global_news_markets/results/global_null_diagnostic_v1.md"
+      ]
+    },
+    {
+      "id": "RAW-EVENT-PILOT-001",
+      "title": "Fourteen-day verified GDELT daily Event raw pilot",
+      "class": "data_pipeline_validation",
+      "status": "PENDING",
+      "sample": "2025-07-18/2025-07-31",
+      "required_gates": [
+        "official MD5 match",
+        "ZIP integrity",
+        "58-column fraction >= 99.9%",
+        "SQLDATE match >= 99%",
+        "Silver Parquet and global/country/bilateral Gold outputs"
+      ],
+      "artifacts": [
+        "research/global_news_markets/raw_event_pilot_protocol.md",
+        "research/global_news_markets/run_raw_event_pilot_v2.py",
+        ".github/workflows/raw-event-pilot.yml"
+      ]
+    }
+  ]
+}

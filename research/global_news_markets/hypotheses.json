@@ -1,0 +1,16 @@
+{
+  "version":"stage1-v1.0-pre-results",
+  "families":[
+    {"id":"H-RET","claim":"GDELT 新闻特征对下一交易日收益具有非零增量解释力","target":"next_return","expected":"nonzero"},
+    {"id":"H-VOL","claim":"GDELT 新闻特征对下一交易日绝对收益具有正向增量解释力","target":"next_abs_return","expected":"positive"}
+  ],
+  "features":["volume_z30","negative_pressure"],
+  "horizons":[1],
+  "fdr_alpha":0.10,
+  "placebo_alpha":0.10,
+  "min_oos_improvement":0.0,
+  "min_sign_stability":0.60,
+  "min_observations":120,
+  "placebo_repetitions":100,
+  "hac_lags":5
+}
