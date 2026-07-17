@@ -7,19 +7,29 @@ on:
       - "src/**"
       - "tests/**"
       - "pyproject.toml"
+      - "research/global_news_markets/asset_universe.json"
       - "research/global_news_markets/run_raw_event_pilot.py"
       - "research/global_news_markets/run_raw_event_pilot_v2.py"
       - "research/global_news_markets/raw_event_pilot_protocol.md"
+      - "research/global_news_markets/run_market_data_pilot.py"
+      - "research/global_news_markets/market_data_pilot_protocol.md"
       - ".github/workflows/ci.yml"
   pull_request:
     paths:
       - "src/**"
       - "tests/**"
       - "pyproject.toml"
+      - "research/global_news_markets/asset_universe.json"
       - "research/global_news_markets/run_raw_event_pilot.py"
       - "research/global_news_markets/run_raw_event_pilot_v2.py"
       - "research/global_news_markets/raw_event_pilot_protocol.md"
+      - "research/global_news_markets/run_market_data_pilot.py"
+      - "research/global_news_markets/market_data_pilot_protocol.md"
       - ".github/workflows/ci.yml"
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -85,3 +95,45 @@ jobs:
           test -s raw_event_output/global_day_state.parquet
           test -s raw_event_output/country_day_state.parquet
           test -s raw_event_output/bilateral_day_relation.parquet
+
+  market-data-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install market coverage dependencies
+        run: python -m pip install pandas pyarrow matplotlib yfinance --quiet
+      - name: Download and audit 29 cross-market series
+        id: market_data
+        continue-on-error: true
+        env:
+          MPLBACKEND: Agg
+        run: |
+          mkdir -p market_coverage_output
+          set +e
+          python research/global_news_markets/run_market_data_pilot.py \
+            --output market_coverage_output > market_coverage_output/run.log 2>&1
+          status=$?
+          echo "$status" > market_coverage_output/exit_code.txt
+          cat market_coverage_output/run.log
+          exit 0
+      - name: Upload market coverage evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-market-price-coverage-pilot
+          path: market_coverage_output/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Enforce market coverage outputs
+        if: always()
+        run: |
+          test -f market_coverage_output/exit_code.txt
+          test "$(cat market_coverage_output/exit_code.txt)" = "0"
+          test -s market_coverage_output/manifest.json
+          test -s market_coverage_output/market_coverage.json
+          test -s market_coverage_output/market_daily.parquet
