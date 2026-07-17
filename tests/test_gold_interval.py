@@ -12,6 +12,7 @@ TIMESTAMP = "20260717054500"
 
 
 def receipt(tmp_path: Path, dataset: str, frame: object, *, timestamp: str = TIMESTAMP) -> SilverReceipt:
+    tmp_path.mkdir(parents=True, exist_ok=True)
     path = tmp_path / f"{dataset}.parquet"
     frame.write_parquet(path)
     return SilverReceipt(
@@ -81,6 +82,11 @@ def test_build_news_interval_gold(tmp_path: Path) -> None:
 def test_gold_rejects_unaligned_silver_inputs(tmp_path: Path) -> None:
     receipts = list(aligned_receipts(tmp_path))
     gkg_frame = pl.read_parquet(receipts[2].silver_path)
-    receipts[2] = receipt(tmp_path / "other", "gkg", gkg_frame, timestamp="20260717060000")
+    receipts[2] = receipt(
+        tmp_path / "other",
+        "gkg",
+        gkg_frame,
+        timestamp="20260717060000",
+    )
     with pytest.raises(GoldAggregationError, match="not aligned"):
         build_news_interval_gold(tuple(receipts), tmp_path / "data")
