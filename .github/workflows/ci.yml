@@ -19,7 +19,7 @@ jobs:
           python-version: "3.11"
           cache: pip
       - run: python -m pip install --upgrade pip
-      - run: pip install -e '.[dev]'
+      - run: pip install -e '.[data,dev]'
       - name: Run Ruff and preserve diagnostics
         id: ruff
         continue-on-error: true
