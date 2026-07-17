@@ -38,6 +38,10 @@ def gdelt_sample(
     sample_rows: int = typer.Option(10_000, min=1, max=1_000_000),
     max_download_mb: int = typer.Option(1_500, min=1, max=20_000),
     min_free_disk_gb: int = typer.Option(300, min=1),
+    allow_insecure_http: bool = typer.Option(
+        False,
+        help="Explicitly allow the legacy unauthenticated HTTP GDELT raw endpoint",
+    ),
 ) -> None:
     """Download and validate one real aligned GDELT trio through DuckDB."""
 
@@ -49,6 +53,7 @@ def gdelt_sample(
         root,
         limits=limits,
         sample_rows=sample_rows,
+        allow_insecure_http=allow_insecure_http,
     )
     json_path, markdown_path = write_gdelt_sample_report(report, root / "reports")
     typer.echo(report.to_markdown())
