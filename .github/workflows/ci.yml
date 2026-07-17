@@ -50,7 +50,7 @@ jobs:
         run: |
           mkdir -p research_output
           set +e
-          python research/gdelt_wikipedia_attention/run_study.py > research_output/run.log 2>&1
+          python research/gdelt_wikipedia_attention/run_study_quality_filtered.py > research_output/run.log 2>&1
           status=$?
           echo "$status" > research_output/exit_code.txt
           cat research_output/run.log
@@ -63,3 +63,10 @@ jobs:
           path: research_output/
           if-no-files-found: error
           retention-days: 30
+      - name: Enforce research success
+        if: always()
+        run: |
+          test -f research_output/exit_code.txt
+          test "$(cat research_output/exit_code.txt)" = "0"
+          test -s research_output/results.json
+          test -s research_output/analysis_panel.csv
