@@ -12,6 +12,7 @@ class SessionLabel(StrEnum):
     PRE_MARKET = "pre_market"
     REGULAR = "regular"
     POST_MARKET = "post_market"
+    MIDDAY_BREAK = "midday_break"
     MAINTENANCE = "maintenance"
     CLOSED = "closed"
 
@@ -39,6 +40,7 @@ class TimestampAlignment:
     reaction_trading_date: date
     session_open_utc: datetime
     session_close_utc: datetime
+    reaction_start_utc: datetime
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,6 +60,8 @@ class MarketCalendar:
     session_open_day_offset: int = 0
     pre_market_open: time | None = None
     post_market_close: time | None = None
+    break_start: time | None = None
+    break_end: time | None = None
     weekdays: frozenset[int] = frozenset({0, 1, 2, 3, 4})
     holidays: frozenset[date] = frozenset()
     overrides: tuple[SessionOverride, ...] = ()
@@ -68,6 +72,10 @@ class MarketCalendar:
             raise ValueError("session_open_day_offset must be -1 or 0")
         if not self.calendar_id:
             raise ValueError("calendar_id is required")
+        if (self.break_start is None) != (self.break_end is None):
+            raise ValueError("break_start and break_end must be provided together")
+        if self.break_start is not None and self.session_open_day_offset != 0:
+            raise ValueError("midday breaks are only supported for same-day sessions")
         ZoneInfo(self.timezone_name)
         override_dates = [item.trading_date for item in self.overrides]
         if len(override_dates) != len(set(override_dates)):
@@ -116,13 +124,27 @@ class MarketCalendar:
             raise ValueError("session close must be after session open")
         return open_dt, close_dt
 
+    def _break_bounds_local(self, trading_date: date) -> tuple[datetime, datetime] | None:
+        if self.break_start is None or self.break_end is None:
+            return None
+        start = datetime.combine(trading_date, self.break_start, self.timezone)
+        end = datetime.combine(trading_date, self.break_end, self.timezone)
+        if end <= start:
+            raise ValueError("break_end must be after break_start")
+        return start, end
+
     def _regular_trading_date(self, local_timestamp: datetime) -> date | None:
         candidates = (local_timestamp.date(), local_timestamp.date() + timedelta(days=1))
         for trading_date in candidates:
             if not self.is_trading_day(trading_date):
                 continue
             open_dt, close_dt = self.session_bounds_local(trading_date)
-            if open_dt <= local_timestamp < close_dt:
+            break_bounds = self._break_bounds_local(trading_date)
+            in_break = (
+                break_bounds is not None
+                and break_bounds[0] <= local_timestamp < break_bounds[1]
+            )
+            if open_dt <= local_timestamp < close_dt and not in_break:
                 return trading_date
         return None
 
@@ -145,6 +167,12 @@ class MarketCalendar:
 
         local_date = local_timestamp.date()
         if self.session_open_day_offset == 0 and self.is_trading_day(local_date):
+            break_bounds = self._break_bounds_local(local_date)
+            if (
+                break_bounds is not None
+                and break_bounds[0] <= local_timestamp < break_bounds[1]
+            ):
+                return SessionLabel.MIDDAY_BREAK
             open_dt, close_dt = self.session_bounds_local(local_date)
             if self.pre_market_open is not None:
                 pre_dt = datetime.combine(local_date, self.pre_market_open, self.timezone)
@@ -161,7 +189,11 @@ class MarketCalendar:
                 next_open, _ = self.session_bounds_local(next_date)
                 prior_date = self.previous_trading_day(next_date)
                 _, prior_close = self.session_bounds_local(prior_date)
-                if prior_close <= local_timestamp < next_open:
+                session_start_date = next_date + timedelta(days=self.session_open_day_offset)
+                if (
+                    local_date == session_start_date
+                    and prior_close <= local_timestamp < next_open
+                ):
                     return SessionLabel.MAINTENANCE
         return SessionLabel.CLOSED
 
@@ -174,6 +206,7 @@ class MarketCalendar:
         if regular_date is not None:
             trading_date = regular_date
             open_dt, close_dt = self.session_bounds_local(trading_date)
+            reaction_start = local_timestamp
         elif (
             observed is SessionLabel.PRE_MARKET
             and self.session_open_day_offset == 0
@@ -181,8 +214,17 @@ class MarketCalendar:
         ):
             trading_date = local_timestamp.date()
             open_dt, close_dt = self.session_bounds_local(trading_date)
+            reaction_start = open_dt
+        elif observed is SessionLabel.MIDDAY_BREAK:
+            trading_date = local_timestamp.date()
+            open_dt, close_dt = self.session_bounds_local(trading_date)
+            break_bounds = self._break_bounds_local(trading_date)
+            if break_bounds is None:
+                raise RuntimeError("midday break classification without break bounds")
+            reaction_start = break_bounds[1]
         else:
             trading_date, open_dt, close_dt = self._next_session(local_timestamp)
+            reaction_start = open_dt
 
         return TimestampAlignment(
             calendar_id=self.calendar_id,
@@ -192,6 +234,7 @@ class MarketCalendar:
             reaction_trading_date=trading_date,
             session_open_utc=open_dt.astimezone(timezone.utc),
             session_close_utc=close_dt.astimezone(timezone.utc),
+            reaction_start_utc=reaction_start.astimezone(timezone.utc),
         )
 
 
@@ -209,6 +252,8 @@ MARKET_CALENDARS: Mapping[str, MarketCalendar] = MappingProxyType(
             regular_open=time(9, 30),
             regular_close=time(15, 0),
             pre_market_open=time(9, 15),
+            break_start=time(11, 30),
+            break_end=time(13, 0),
             version="framework-v1",
         ),
         "XKRX": MarketCalendar(
@@ -225,6 +270,8 @@ MARKET_CALENDARS: Mapping[str, MarketCalendar] = MappingProxyType(
             regular_open=time(9, 0),
             regular_close=time(15, 30),
             pre_market_open=time(8, 0),
+            break_start=time(11, 30),
+            break_end=time(12, 30),
             version="framework-v1",
         ),
         "XNYS": MarketCalendar(
