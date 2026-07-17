@@ -1,6 +1,11 @@
 {
   "schema_version": "1.0",
-  "research_window": {"start": "2025-07-01", "end": "2026-06-30"},
+  "research_window": {"start": "2025-07-18", "end": "2026-06-30"},
+  "protocol_amendment": {
+    "registered_at": "2026-07-17",
+    "reason": "The original 2025-07-01 start exceeded the GDELT DOC API documented one-year search window at execution time. The start was moved before any pilot results were read.",
+    "impact": "The pilot loses 17 calendar days but remains a near-one-year engineering and hypothesis-screening sample. The final study will use raw GDELT or BigQuery for long history."
+  },
   "notes": [
     "This is the first real-data pilot universe, not the final 100-page report universe.",
     "Yahoo Finance symbols are used only as a reproducible public-data pilot and are classified as C-grade research inputs.",
