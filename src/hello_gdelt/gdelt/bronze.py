@@ -85,6 +85,16 @@ def write_bronze_parquet(
     target = bronze_partition_path(root, artifact)
     manifest = target.with_suffix(".manifest.json")
     if target.exists() and not overwrite:
+        if manifest.exists():
+            stored = json.loads(manifest.read_text(encoding="utf-8"))
+            receipt = BronzeReceipt(**stored)
+            if (
+                receipt.dataset == artifact.dataset
+                and receipt.source_timestamp == artifact.timestamp
+                and receipt.source_md5 == artifact.md5
+                and Path(receipt.parquet_path).is_file()
+            ):
+                return receipt
         raise FileExistsError(target)
     target.parent.mkdir(parents=True, exist_ok=True)
     part = target.with_name(f".{target.name}.part")
