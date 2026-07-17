@@ -37,7 +37,7 @@ jobs:
         env:
           MPLBACKEND: Agg
           RESEARCH_OUTPUT: research_output_global_market
-        run: python research/global_market_pilot/run_pilot.py
+        run: python research/global_market_pilot/run_pilot_fast.py
       - name: Show summary
         run: |
           python -m json.tool research_output_global_market/summary.json
