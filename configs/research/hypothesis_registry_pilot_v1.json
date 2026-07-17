@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "registration_status": "frozen_before_results",
+  "primary_families": [
+    {
+      "family_id": "H1_directional_return",
+      "claim": "Lagged GDELT news shocks contain incremental information for future asset returns beyond the asset's own lagged return.",
+      "targets": ["forward_return_1d", "forward_return_5d"],
+      "expected_sign": "two_sided",
+      "decision": "HAC p-value, family BH-FDR q<=0.05, positive walk-forward RMSE improvement, and placebo outperformance"
+    },
+    {
+      "family_id": "H2_volatility_response",
+      "claim": "Lagged GDELT news shocks contain incremental information for future absolute returns.",
+      "targets": ["forward_abs_return_1d", "forward_abs_return_5d"],
+      "expected_sign": "nonnegative_for_count_shocks",
+      "decision": "HAC p-value, family BH-FDR q<=0.05, positive walk-forward RMSE improvement, and placebo outperformance"
+    },
+    {
+      "family_id": "H3_negative_tone_asymmetry",
+      "claim": "Negative tone shocks have stronger volatility effects than positive tone shocks.",
+      "targets": ["forward_abs_return_1d", "forward_abs_return_5d"],
+      "expected_sign": "negative_tone_increases_volatility",
+      "decision": "interaction or split-sample coefficient difference with BH-FDR and walk-forward confirmation"
+    },
+    {
+      "family_id": "H4_cross_market_heterogeneity",
+      "claim": "The same news factor has heterogeneous effects across equity, futures, spot-proxy and FX markets.",
+      "targets": ["forward_return_1d", "forward_abs_return_1d"],
+      "expected_sign": "market_specific",
+      "decision": "market-family pooled model and between-market coefficient tests"
+    }
+  ],
+  "placebos": ["circular_time_shift", "random_factor_permutation"],
+  "multiple_testing": {"method": "Benjamini-Hochberg", "levels": ["factor_target_horizon_family", "global"]},
+  "final_states": ["SUPPORTED", "REJECTED", "INCONCLUSIVE", "DATA_INSUFFICIENT", "SOURCE_FAILED"]
+}
