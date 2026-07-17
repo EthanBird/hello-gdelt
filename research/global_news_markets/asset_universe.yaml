@@ -1,0 +1,140 @@
+schema_version: '1.0'
+registry_version: v0.1.0
+candidate_asset_count: 110
+target_confirmatory_count: 96
+point_in_time_rule: >-
+  Final inclusion requires point-in-time membership, delisting history, corporate actions,
+  licensed price lineage, and a pinned exchange-calendar snapshot.
+row_schema: [asset_id, asset_class, calendar, symbol, name, status]
+groups:
+  china:
+    price_source_priority: sse_szse_official_then_licensed
+    assets:
+      - ["cn_csi300", "index", "XSHG", "000300", "CSI 300", "candidate"]
+      - ["cn_sse50", "index", "XSHG", "000016", "SSE 50", "candidate"]
+      - ["cn_star50", "index", "XSHG", "000688", "STAR 50", "candidate"]
+      - ["cn_chinext", "index", "XSHG", "399006", "ChiNext Index", "candidate"]
+      - ["cn_kweichow_moutai", "equity", "XSHG", "600519", "Kweichow Moutai", "candidate"]
+      - ["cn_ping_an", "equity", "XSHG", "601318", "Ping An Insurance", "candidate"]
+      - ["cn_cmb", "equity", "XSHG", "600036", "China Merchants Bank", "candidate"]
+      - ["cn_ctg", "equity", "XSHG", "600900", "China Yangtze Power", "candidate"]
+      - ["cn_zijin", "equity", "XSHG", "601899", "Zijin Mining", "candidate"]
+      - ["cn_petrochina", "equity", "XSHG", "601857", "PetroChina", "candidate"]
+      - ["cn_wuxi_apptec", "equity", "XSHG", "603259", "WuXi AppTec", "candidate"]
+      - ["cn_longi", "equity", "XSHG", "601012", "LONGi Green Energy", "candidate"]
+      - ["cn_wuliangye", "equity", "XSHG", "000858", "Wuliangye Yibin", "candidate"]
+      - ["cn_midea", "equity", "XSHG", "000333", "Midea Group", "candidate"]
+      - ["cn_byd", "equity", "XSHG", "002594", "BYD", "candidate"]
+      - ["cn_catl", "equity", "XSHG", "300750", "CATL", "candidate"]
+      - ["cn_east_money", "equity", "XSHG", "300059", "East Money", "candidate"]
+      - ["cn_luxshare", "equity", "XSHG", "002475", "Luxshare Precision", "candidate"]
+      - ["cn_ping_an_bank", "equity", "XSHG", "000001", "Ping An Bank", "candidate"]
+      - ["cn_hikvision", "equity", "XSHG", "002415", "Hikvision", "candidate"]
+  korea:
+    price_source_priority: krx_data_marketplace_then_licensed
+    assets:
+      - ["kr_kospi", "index", "XKRX", "KOSPI", "KOSPI", "candidate"]
+      - ["kr_kospi200", "index", "XKRX", "KOSPI200", "KOSPI 200", "candidate"]
+      - ["kr_kosdaq", "index", "XKRX", "KOSDAQ", "KOSDAQ", "candidate"]
+      - ["kr_samsung_electronics", "equity", "XKRX", "005930", "Samsung Electronics", "candidate"]
+      - ["kr_sk_hynix", "equity", "XKRX", "000660", "SK hynix", "candidate"]
+      - ["kr_hyundai_motor", "equity", "XKRX", "005380", "Hyundai Motor", "candidate"]
+      - ["kr_kia", "equity", "XKRX", "000270", "Kia", "candidate"]
+      - ["kr_naver", "equity", "XKRX", "035420", "NAVER", "candidate"]
+      - ["kr_kakao", "equity", "XKRX", "035720", "Kakao", "candidate"]
+      - ["kr_lg_chem", "equity", "XKRX", "051910", "LG Chem", "candidate"]
+      - ["kr_samsung_sdi", "equity", "XKRX", "006400", "Samsung SDI", "candidate"]
+      - ["kr_samsung_biologics", "equity", "XKRX", "207940", "Samsung Biologics", "candidate"]
+      - ["kr_celltrion", "equity", "XKRX", "068270", "Celltrion", "candidate"]
+      - ["kr_kb_financial", "equity", "XKRX", "105560", "KB Financial", "candidate"]
+      - ["kr_shinhan_financial", "equity", "XKRX", "055550", "Shinhan Financial", "candidate"]
+  japan:
+    price_source_priority: jpx_jquants_then_licensed
+    assets:
+      - ["jp_nikkei225", "index", "XJPX", "N225", "Nikkei 225", "candidate"]
+      - ["jp_topix", "index", "XJPX", "TOPIX", "TOPIX", "candidate"]
+      - ["jp_jpx400", "index", "XJPX", "JPX400", "JPX-Nikkei 400", "candidate"]
+      - ["jp_toyota", "equity", "XJPX", "7203", "Toyota Motor", "candidate"]
+      - ["jp_sony", "equity", "XJPX", "6758", "Sony Group", "candidate"]
+      - ["jp_softbank", "equity", "XJPX", "9984", "SoftBank Group", "candidate"]
+      - ["jp_mufg", "equity", "XJPX", "8306", "Mitsubishi UFJ Financial", "candidate"]
+      - ["jp_hitachi", "equity", "XJPX", "6501", "Hitachi", "candidate"]
+      - ["jp_tokyo_electron", "equity", "XJPX", "8035", "Tokyo Electron", "candidate"]
+      - ["jp_keyence", "equity", "XJPX", "6861", "Keyence", "candidate"]
+      - ["jp_ntt", "equity", "XJPX", "9432", "NTT", "candidate"]
+      - ["jp_recruit", "equity", "XJPX", "6098", "Recruit Holdings", "candidate"]
+      - ["jp_shin_etsu", "equity", "XJPX", "4063", "Shin-Etsu Chemical", "candidate"]
+      - ["jp_honda", "equity", "XJPX", "7267", "Honda Motor", "candidate"]
+      - ["jp_takeda", "equity", "XJPX", "4502", "Takeda Pharmaceutical", "candidate"]
+  united_states:
+    price_source_priority: sec_exchange_licensed_then_public_proxy
+    assets:
+      - ["us_sp500", "etf", "XNYS", "SPY", "SPDR S&P 500 ETF", "candidate"]
+      - ["us_nasdaq100", "etf", "XNYS", "QQQ", "Invesco QQQ", "candidate"]
+      - ["us_russell2000", "etf", "XNYS", "IWM", "iShares Russell 2000", "candidate"]
+      - ["us_dow", "etf", "XNYS", "DIA", "SPDR Dow Jones Industrial Average", "candidate"]
+      - ["us_apple", "equity", "XNYS", "AAPL", "Apple", "candidate"]
+      - ["us_microsoft", "equity", "XNYS", "MSFT", "Microsoft", "candidate"]
+      - ["us_nvidia", "equity", "XNYS", "NVDA", "NVIDIA", "candidate"]
+      - ["us_amazon", "equity", "XNYS", "AMZN", "Amazon", "candidate"]
+      - ["us_alphabet", "equity", "XNYS", "GOOGL", "Alphabet", "candidate"]
+      - ["us_meta", "equity", "XNYS", "META", "Meta Platforms", "candidate"]
+      - ["us_tesla", "equity", "XNYS", "TSLA", "Tesla", "candidate"]
+      - ["us_jpmorgan", "equity", "XNYS", "JPM", "JPMorgan Chase", "candidate"]
+      - ["us_bank_of_america", "equity", "XNYS", "BAC", "Bank of America", "candidate"]
+      - ["us_exxon", "equity", "XNYS", "XOM", "Exxon Mobil", "candidate"]
+      - ["us_chevron", "equity", "XNYS", "CVX", "Chevron", "candidate"]
+      - ["us_unitedhealth", "equity", "XNYS", "UNH", "UnitedHealth Group", "candidate"]
+      - ["us_eli_lilly", "equity", "XNYS", "LLY", "Eli Lilly", "candidate"]
+      - ["us_caterpillar", "equity", "XNYS", "CAT", "Caterpillar", "candidate"]
+      - ["us_boeing", "equity", "XNYS", "BA", "Boeing", "candidate"]
+      - ["us_walmart", "equity", "XNYS", "WMT", "Walmart", "candidate"]
+      - ["us_costco", "equity", "XNYS", "COST", "Costco", "candidate"]
+      - ["us_amd", "equity", "XNYS", "AMD", "Advanced Micro Devices", "candidate"]
+      - ["us_broadcom", "equity", "XNYS", "AVGO", "Broadcom", "candidate"]
+      - ["us_semiconductor_etf", "etf", "XNYS", "SMH", "VanEck Semiconductor ETF", "candidate"]
+      - ["us_energy_etf", "etf", "XNYS", "XLE", "Energy Select Sector SPDR", "candidate"]
+  cme:
+    price_source_priority: cme_datamine_or_licensed_vendor
+    assets:
+      - ["cme_es", "future", "XCME", "ES", "E-mini S&P 500", "candidate"]
+      - ["cme_nq", "future", "XCME", "NQ", "E-mini Nasdaq-100", "candidate"]
+      - ["cme_rty", "future", "XCME", "RTY", "E-mini Russell 2000", "candidate"]
+      - ["cme_zn", "future", "XCME", "ZN", "10-Year Treasury Note", "candidate"]
+      - ["cme_zb", "future", "XCME", "ZB", "30-Year Treasury Bond", "candidate"]
+      - ["cme_cl", "future", "XCME", "CL", "WTI Crude Oil", "candidate"]
+      - ["cme_ng", "future", "XCME", "NG", "Henry Hub Natural Gas", "candidate"]
+      - ["cme_gc", "future", "XCME", "GC", "COMEX Gold", "candidate"]
+      - ["cme_si", "future", "XCME", "SI", "COMEX Silver", "candidate"]
+      - ["cme_hg", "future", "XCME", "HG", "COMEX Copper", "candidate"]
+      - ["cme_zc", "future", "XCME", "ZC", "Corn", "candidate"]
+      - ["cme_zw", "future", "XCME", "ZW", "Chicago Wheat", "candidate"]
+      - ["cme_zs", "future", "XCME", "ZS", "Soybeans", "candidate"]
+      - ["cme_6e", "future", "XCME", "6E", "Euro FX", "candidate"]
+      - ["cme_6j", "future", "XCME", "6J", "Japanese Yen", "candidate"]
+  london:
+    price_source_priority: lbma_licensed_or_explicit_proxy
+    assets:
+      - ["lon_lbma_gold", "benchmark", "XLON", "LBMA_GOLD", "LBMA Gold Price", "licence_blocked_until_entitled"]
+      - ["lon_lbma_silver", "benchmark", "XLON", "LBMA_SILVER", "LBMA Silver Price", "licence_blocked_until_entitled"]
+      - ["lon_gold_proxy", "spot_proxy", "XLON", "XAUUSD_PROXY", "London gold spot proxy", "candidate"]
+      - ["lon_silver_proxy", "spot_proxy", "XLON", "XAGUSD_PROXY", "London silver spot proxy", "candidate"]
+      - ["lon_copper_proxy", "spot_proxy", "XLON", "LONDON_COPPER_PROXY", "London copper proxy", "candidate"]
+  foreign_exchange:
+    price_source_priority: ecb_reference_rates_then_licensed_intraday
+    assets:
+      - ["fx_eurusd", "fx", "XLON", "EURUSD", "EUR/USD", "candidate"]
+      - ["fx_usdjpy", "fx", "XLON", "USDJPY", "USD/JPY", "candidate"]
+      - ["fx_gbpusd", "fx", "XLON", "GBPUSD", "GBP/USD", "candidate"]
+      - ["fx_usdchf", "fx", "XLON", "USDCHF", "USD/CHF", "candidate"]
+      - ["fx_audusd", "fx", "XLON", "AUDUSD", "AUD/USD", "candidate"]
+      - ["fx_usdcad", "fx", "XLON", "USDCAD", "USD/CAD", "candidate"]
+      - ["fx_nzdusd", "fx", "XLON", "NZDUSD", "NZD/USD", "candidate"]
+      - ["fx_usdcny", "fx", "XLON", "USDCNY", "USD/CNY", "candidate"]
+      - ["fx_usdkrw", "fx", "XLON", "USDKRW", "USD/KRW", "candidate"]
+      - ["fx_usdsgd", "fx", "XLON", "USDSGD", "USD/SGD", "candidate"]
+      - ["fx_usdhkd", "fx", "XLON", "USDHKD", "USD/HKD", "candidate"]
+      - ["fx_eurjpy", "fx", "XLON", "EURJPY", "EUR/JPY", "candidate"]
+      - ["fx_eurgbp", "fx", "XLON", "EURGBP", "EUR/GBP", "candidate"]
+      - ["fx_gbpjpy", "fx", "XLON", "GBPJPY", "GBP/JPY", "candidate"]
+      - ["fx_dxy_proxy", "index_proxy", "XLON", "DXY_PROXY", "US Dollar Index proxy", "candidate"]

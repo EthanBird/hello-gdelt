@@ -1,0 +1,62 @@
+schema_version: '1.0'
+registry_version: v0.1.0
+status: preregistration_draft
+planned_confirmatory_hypotheses: 96
+phase_1_hypotheses: 24
+frozen_before_final_holdout: false
+row_schema:
+  - hypothesis_id
+  - family
+  - claim
+  - exposure
+  - outcome
+  - horizons
+  - universe
+  - expected_effect
+  - primary_model
+  - fdr_family
+  - decision_notes
+hypotheses:
+  - [H001, attention, "异常新闻注意力提高下一交易时段绝对收益", abnormal_article_volume_z, absolute_return, [0, 1], global_equity_indices, positive, panel_fixed_effects, attention_risk, "需同时通过日期和实体置换"]
+  - [H002, attention, "异常新闻注意力提高成交量或换手率", abnormal_article_volume_z, abnormal_volume, [0, 1], global_equities_and_cme, positive, panel_fixed_effects, attention_liquidity, "经济阈值按各市场历史标准差定义"]
+  - [H003, sentiment, "公司或市场负面新闻降低下一交易时段异常收益", negative_tone_share_z, abnormal_return, [0, 1, 5], global_equities, negative, local_projection, sentiment_returns, "控制市场、行业和日期固定效应"]
+  - [H004, sentiment, "负面新闻对波动率的影响强于正面新闻", negative_minus_positive_extreme_share, realized_or_range_volatility, [0, 1, 5], global_equities_and_futures, positive, har_x, sentiment_volatility, "检验正负冲击系数差"]
+  - [H005, novelty, "首次出现的负面新闻比重复报道产生更大的价格反应", negative_tone_x_novelty, abnormal_return, [0, 1, 5], global_equities, negative, panel_fixed_effects, novelty_returns, "交互项为主效应"]
+  - [H006, diffusion, "独立来源多样性比文章总数更能解释绝对收益", source_diversity_z, absolute_return, [0, 1], global_equities_and_futures, positive, nested_walk_forward, diffusion_risk, "与仅含文章数基线比较样本外增量"]
+  - [H007, repetition, "在控制新颖度和来源多样性后重复转载的方向性收益接近零", duplicate_share_z, abnormal_return, [0, 1], global_equities, equivalence_zero, equivalence_panel, repetition_returns, "使用预注册等效区间而非不显著即为零"]
+  - [H008, media_disagreement, "国内外媒体情绪分歧提高下一开盘跳空绝对值", domestic_foreign_tone_gap_abs, opening_gap_abs, [0], china_korea_japan_equities, positive, panel_fixed_effects, disagreement_opening, "媒体归属规则在运行前冻结"]
+  - [H009, geopolitics, "高强度国际冲突新闻提高黄金代理收益", conflict_intensity_shock, gold_proxy_return, [0, 1, 5], cme_gold_and_london_proxy, positive, local_projection, geopolitics_safe_haven, "LBMA 未获许可时仅报告明确代理"]
+  - [H010, geopolitics, "高强度国际冲突新闻推动日元和瑞郎避险升值", conflict_intensity_shock, safe_haven_fx_return, [0, 1, 5], usd_jpy_and_usd_chf, negative, local_projection, geopolitics_safe_haven, "按 USD/JPY 与 USD/CHF 报价方向定义负值为避险货币升值"]
+  - [H011, geopolitics, "高强度国际冲突新闻降低全球股指收益并提高波动", conflict_intensity_shock, equity_index_return_and_volatility, [0, 1, 5], global_equity_indices, negative_return_positive_vol, local_projection, geopolitics_equities, "收益和波动分别裁决并进行族内 FDR"]
+  - [H012, energy, "制裁和供应中断新闻提高 WTI 原油收益", energy_supply_disruption_shock, cme_cl_return, [0, 1, 5], cme_cl, positive, event_study, energy_returns, "控制 OPEC 会议和库存公告窗口"]
+  - [H013, energy, "能源供应中断新闻提高原油与天然气成交量和波动", energy_supply_disruption_shock, energy_volume_and_volatility, [0, 1, 5], cme_cl_ng, positive, har_x, energy_risk, "收益方向与风险效应分开裁决"]
+  - [H014, monetary_policy, "偏鹰货币政策新闻降低美国长久期成长资产收益", hawkish_policy_tone_shock, nasdaq_and_semiconductor_return, [0, 1, 5], us_nasdaq_semiconductor, negative, local_projection, monetary_policy_equities, "控制正式央行决议和宏观发布时间"]
+  - [H015, monetary_policy, "偏鹰美国政策新闻推动美元相对主要货币升值", fed_hawkish_tone_shock, usd_fx_basket_return, [0, 1, 5], major_fx_pairs, positive_usd, local_projection, monetary_policy_fx, "统一转换为美元升值方向"]
+  - [H016, inflation, "通胀叙事冲击提高黄金波动并改变债券收益", inflation_narrative_shock, gold_vol_and_treasury_futures_return, [0, 1, 5], cme_gc_zn_zb, nonzero, local_projection, inflation_cross_asset, "方向性子结论分别预注册"]
+  - [H017, growth, "全球增长担忧新闻降低铜和周期股收益", growth_concern_shock, copper_and_cyclical_return, [0, 1, 5], cme_hg_and_cyclical_equities, negative, local_projection, growth_cyclicals, "控制同期美元和原油变动"]
+  - [H018, semiconductor_spillover, "美国半导体利好新闻向下一亚洲交易日的日韩半导体股传播", us_semiconductor_positive_shock, asia_semiconductor_return, [0, 1], jp_kr_semiconductor_equities, positive, cross_timezone_event_study, semiconductor_spillover, "美国盘后新闻映射至下一亚洲开盘"]
+  - [H019, semiconductor_spillover, "美国科技或半导体利空新闻降低下一亚洲交易日日韩相关股票收益", us_semiconductor_negative_shock, asia_semiconductor_return, [0, 1], jp_kr_semiconductor_equities, negative, cross_timezone_event_study, semiconductor_spillover, "与 H018 在同一假设族校正"]
+  - [H020, disclosure, "媒体在正式公司披露前出现时其增量预测力弱于披露后的即时反应", pre_disclosure_media_shock, abnormal_return, [0, 1, 5], us_equities_with_sec, smaller_than_disclosure, matched_event_study, disclosure_media, "严格使用 SEC 接收时间并排除时间戳不明样本"]
+  - [H021, disclosure, "正式披露与媒体报道方向一致时价格反应强于仅有媒体报道", disclosure_media_direction_agreement, abnormal_return_abs, [0, 1], us_equities_with_sec, positive, matched_event_study, disclosure_media, "按披露类型分层"]
+  - [H022, agriculture, "极端天气和出口限制新闻提高谷物期货波动率", crop_weather_export_shock, grain_futures_volatility, [0, 1, 5, 10], cme_zc_zw_zs, positive, har_x, agriculture_risk, "控制 USDA 公告日和季节性"]
+  - [H023, china_policy, "负面监管或产业政策新闻降低相关 A 股行业和个股异常收益", china_regulatory_negative_shock, a_share_abnormal_return, [0, 1, 5], china_equities, negative, panel_fixed_effects, china_policy_returns, "控制涨跌停、停牌和市场共同冲击"]
+  - [H024, state_dependence, "新闻冲击对收益和波动的影响在高波动状态更强", news_shock_x_high_vol_regime, return_and_volatility_response_abs, [0, 1, 5], global_cross_asset, positive_interaction, threshold_panel, state_dependence, "高波动状态仅由冲击前数据定义"]
+default_controls:
+  - market_return
+  - sector_return
+  - lagged_return
+  - lagged_volatility
+  - abnormal_volume
+  - usd_index_proxy
+  - crude_oil_return
+  - weekday
+  - month
+  - earnings_window
+  - macro_release_window
+default_decision_gate:
+  family_q_max: 0.05
+  placebo_empirical_p_max: 0.05
+  min_fold_sign_agreement: 0.60
+  require_oos_baseline_improvement: true
+  require_economic_threshold: true
+  permitted_decisions: [SUPPORTED, REJECTED, INCONCLUSIVE, DATA_INSUFFICIENT, LICENCE_BLOCKED]

@@ -1,0 +1,144 @@
+schema_version: '1.0'
+registry_version: v0.1.0
+review_date: '2026-07-17'
+status_values: [available_public, partial_public, paid_required, licence_blocked, pending_verification]
+sources:
+  gdelt_events_2:
+    provider: GDELT Project
+    dataset: GDELT 2.0 Events
+    role: primary_news_event_source
+    official_url: https://www.gdeltproject.org/data.html
+    cadence: 15_minutes
+    history_start: '2015-02-19'
+    access: public_bulk_files
+    status: available_public
+    retain: raw_archives_and_hashes
+    caveats:
+      - Event records are media-derived observations, not ground-truth event counts.
+      - Long-run volume requires exposure normalization.
+  gdelt_mentions_2:
+    provider: GDELT Project
+    dataset: GDELT 2.0 Event Mentions
+    role: source_diffusion_and_repetition
+    official_url: https://www.gdeltproject.org/data.html
+    cadence: 15_minutes
+    history_start: '2015-02-19'
+    access: public_bulk_files
+    status: available_public
+    retain: raw_archives_and_hashes
+  gdelt_gkg_2:
+    provider: GDELT Project
+    dataset: GDELT 2.0 Global Knowledge Graph
+    role: themes_entities_locations_and_tone
+    official_url: https://www.gdeltproject.org/data.html
+    cadence: 15_minutes
+    history_start: '2015-02-19'
+    access: public_bulk_files
+    status: available_public
+    retain: raw_archives_and_hashes
+    caveats:
+      - Article bodies are not assumed redistributable; retain URLs and derived features only.
+  sse_historical:
+    provider: Shanghai Stock Exchange / SSE InfoNet / CIIS
+    dataset: Historical A-share, B-share and index market data
+    role: china_equity_prices
+    official_url: https://english.sse.com.cn/markets/dataservice/products/
+    cadence: daily_or_intraday_product
+    access: ordered_or_licensed_product
+    status: paid_required
+    retain: metadata_hashes_and_permitted_derivatives_only
+  szse_historical:
+    provider: Shenzhen Stock Exchange data service
+    dataset: Shenzhen equity and index historical data
+    role: china_equity_prices
+    official_url: pending_official_endpoint_verification
+    cadence: daily_or_intraday_product
+    access: subject_to_product_terms
+    status: pending_verification
+    retain: metadata_hashes_and_permitted_derivatives_only
+  krx_marketplace:
+    provider: Korea Exchange
+    dataset: KRX Data Marketplace statistics and historical/data products
+    role: korea_equity_index_and_derivatives_prices
+    official_url: https://data.krx.co.kr/
+    cadence: daily_and_product_dependent
+    access: public_statistics_plus_licensed_products
+    status: partial_public
+    retain: subject_to_website_and_data_product_terms
+  jpx_jquants:
+    provider: Japan Exchange Group / JPX Market Innovation & Research
+    dataset: J-Quants and historical equity data products
+    role: japan_equity_prices_and_corporate_actions
+    official_url: https://www.jpx.co.jp/english/markets/paid-info-equities/historical/
+    cadence: daily_or_intraday_product
+    access: free_and_subscription_tiers
+    status: partial_public
+    retain: subject_to_plan_and_redistribution_terms
+  sec_edgar:
+    provider: U.S. Securities and Exchange Commission
+    dataset: EDGAR submissions and XBRL company facts
+    role: official_us_corporate_disclosure_control
+    official_url: https://www.sec.gov/search-filings/edgar-application-programming-interfaces
+    cadence: realtime_plus_nightly_bulk
+    access: public_no_api_key_with_fair_access_policy
+    status: available_public
+    retain: filings_metadata_and_permitted_documents
+    caveats:
+      - This source supplies disclosure timing and content, not exchange price history.
+  us_market_prices:
+    provider: exchange_or_licensed_vendor
+    dataset: adjusted daily and intraday U.S. equity prices
+    role: us_equity_prices
+    official_url: pending_vendor_entitlement
+    cadence: daily_and_intraday
+    access: licensed_or_clearly_labelled_public_proxy
+    status: pending_verification
+    retain: subject_to_vendor_terms
+  cme_datamine:
+    provider: CME Group
+    dataset: DataMine futures, options, settlements and historical market data
+    role: cme_futures_prices_volume_open_interest_and_rolls
+    official_url: https://www.cmegroup.com/datamine.html
+    cadence: product_dependent
+    access: purchase_and_authenticated_api
+    status: paid_required
+    retain: metadata_hashes_and_permitted_derivatives_only
+  lbma_gold_silver:
+    provider: LBMA / ICE Benchmark Administration
+    dataset: LBMA Gold Price and LBMA Silver Price historical benchmarks
+    role: official_london_precious_metals_benchmarks
+    official_url: https://www.lbma.org.uk/prices-and-data
+    cadence: benchmark_auction
+    access: IBA_usage_licence_required
+    status: licence_blocked
+    retain: no_data_until_entitled
+    substitute_rule: Use an explicitly named CME or public spot proxy; never label it LBMA data.
+  ecb_exr:
+    provider: European Central Bank
+    dataset: EXR exchange-rate dataset
+    role: daily_fx_reference_rates
+    official_url: https://data.ecb.europa.eu/data/datasets/EXR
+    cadence: daily
+    access: public_download_and_sdmx
+    status: available_public
+    retain: raw_downloads_metadata_and_hashes
+    caveats:
+      - Reference rates are informational daily averages, not executable intraday quotes.
+  intraday_fx:
+    provider: licensed_fx_venue_or_vendor
+    dataset: timestamped bid_ask_or_mid_quotes
+    role: intraday_fx_event_studies
+    official_url: pending_vendor_entitlement
+    cadence: tick_or_minute
+    access: licensed
+    status: paid_required
+    retain: subject_to_vendor_terms
+  exchange_calendars:
+    provider: each_exchange_or_market_operator
+    dataset: holidays_special_sessions_and_trading_hours
+    role: point_in_time_session_alignment
+    official_url: per_market_snapshot_manifest
+    cadence: annual_and_ad_hoc
+    access: public_pages_or_notices
+    status: pending_verification
+    retain: normalized_calendar_snapshot_source_url_hash_and_fetch_date
