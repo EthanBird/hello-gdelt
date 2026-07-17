@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-17-v1",
+  "version": "2026-07-17-v2",
   "status_vocabulary": [
     "SUPPORTED",
     "REJECTED",
@@ -88,6 +88,21 @@
       "key_result": "Neither direction has a relation surviving direction-family FDR.",
       "artifacts": [
         "research/global_news_markets/results/bidirectional_lag_exploration_v1.md"
+      ]
+    },
+    {
+      "id": "GLOBAL-NULL-001",
+      "title": "Significance enrichment diagnostic across 1,500 tests",
+      "class": "meta_research_diagnostic",
+      "status": "INCONCLUSIVE",
+      "tests": 1500,
+      "nominal_p_lt_005": 61,
+      "null_expected_at_005": 75,
+      "fdr_q_lt_005": 0,
+      "key_result": "Nominal significance is not enriched beyond the global-null expectation; none of 200 preregistered tests passes the unadjusted joint placebo/OOS/stability gate.",
+      "artifact_sha256": "733578405b6fa83a8d27e54c58d2bd8483a784afd5d4f2163e61f68b33672d81",
+      "artifacts": [
+        "research/global_news_markets/results/global_null_diagnostic_v1.md"
       ]
     },
     {
