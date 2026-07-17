@@ -18,6 +18,7 @@ from hello_gdelt.gdelt.download import (
     fetch_latest_manifest,
 )
 from hello_gdelt.gdelt.schema import DelimitedValidation, validate_tsv_file
+from hello_gdelt.gdelt.silver import SilverReceipt, project_bronze_to_silver
 
 Gate = Literal["GO", "NO_GO"]
 
@@ -36,9 +37,12 @@ class DatasetSampleResult:
     minimum_columns: int
     maximum_columns: int
     malformed_rows: int
-    parquet_path: str
-    parquet_rows: int
-    duckdb_rows: int
+    bronze_path: str
+    bronze_rows: int
+    bronze_duckdb_rows: int
+    silver_path: str
+    silver_rows: int
+    silver_duckdb_rows: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -64,21 +68,22 @@ class GdeltSampleReport:
             f"传输安全：**{self.transport_security}**",
             f"门禁：**{self.gate}**",
             "",
-            "| 数据集 | 下载字节 | 抽样行 | 字段范围 | 坏行 | Parquet 行 | DuckDB 行 |",
+            "| 数据集 | 下载字节 | 抽样行 | 字段范围 | 坏行 | Bronze/DuckDB | Silver/DuckDB |",
             "|---|---:|---:|---:|---:|---:|---:|",
         ]
         for item in self.datasets:
             lines.append(
                 f"| {item.dataset} | {item.downloaded_bytes} | {item.sampled_rows} | "
                 f"{item.minimum_columns}–{item.maximum_columns} | {item.malformed_rows} | "
-                f"{item.parquet_rows} | {item.duckdb_rows} |"
+                f"{item.bronze_rows}/{item.bronze_duckdb_rows} | "
+                f"{item.silver_rows}/{item.silver_duckdb_rows} |"
             )
         if self.failure:
             lines.extend(["", "## 失败", "", f"`{self.failure}`"])
         lines.extend(
             [
                 "",
-                "> GO 只表示一个最新 15 分钟三表样本完成下载、校验、Parquet 与 DuckDB 闭环；不表示历史回填、市场数据或研究假设已经完成。",
+                "> GO 只表示一个最新 15 分钟三表样本完成下载、校验、Bronze、语义 Silver 与 DuckDB 闭环；不表示历史回填、市场数据或研究假设已经完成。",
             ]
         )
         return "\n".join(lines) + "\n"
@@ -113,6 +118,7 @@ def _dataset_result(
     dataset: str,
     validation: DelimitedValidation,
     bronze: BronzeReceipt,
+    silver: SilverReceipt,
     archive_path: Path,
     extracted_path: Path,
     downloaded_bytes: int,
@@ -120,11 +126,17 @@ def _dataset_result(
     archive_sha256: str,
     archive_reused: bool,
 ) -> DatasetSampleResult:
-    duckdb_rows = _duckdb_row_count(Path(bronze.parquet_path))
-    if duckdb_rows != bronze.row_count:
+    bronze_duckdb_rows = _duckdb_row_count(Path(bronze.parquet_path))
+    silver_duckdb_rows = _duckdb_row_count(Path(silver.silver_path))
+    if bronze_duckdb_rows != bronze.row_count:
         raise RuntimeError(
-            f"DuckDB/Parquet row mismatch for {dataset}: "
-            f"duckdb={duckdb_rows}, bronze={bronze.row_count}"
+            f"DuckDB/Bronze row mismatch for {dataset}: "
+            f"duckdb={bronze_duckdb_rows}, bronze={bronze.row_count}"
+        )
+    if silver_duckdb_rows != silver.row_count or silver.row_count != bronze.row_count:
+        raise RuntimeError(
+            f"Silver row mismatch for {dataset}: silver_duckdb={silver_duckdb_rows}, "
+            f"silver={silver.row_count}, bronze={bronze.row_count}"
         )
     return DatasetSampleResult(
         dataset=dataset,
@@ -139,9 +151,12 @@ def _dataset_result(
         minimum_columns=validation.minimum_columns,
         maximum_columns=validation.maximum_columns,
         malformed_rows=validation.malformed_rows,
-        parquet_path=bronze.parquet_path,
-        parquet_rows=bronze.row_count,
-        duckdb_rows=duckdb_rows,
+        bronze_path=bronze.parquet_path,
+        bronze_rows=bronze.row_count,
+        bronze_duckdb_rows=bronze_duckdb_rows,
+        silver_path=silver.silver_path,
+        silver_rows=silver.row_count,
+        silver_duckdb_rows=silver_duckdb_rows,
     )
 
 
@@ -256,6 +271,7 @@ def run_gdelt_latest_sample(
                             paths.data,
                             artifact,
                         )
+                        silver = project_bronze_to_silver(bronze, paths.data)
                         if not already_ready:
                             store.transition(
                                 artifact.url,
@@ -267,6 +283,7 @@ def run_gdelt_latest_sample(
                                 artifact.dataset,
                                 validation,
                                 bronze,
+                                silver,
                                 receipt.path,
                                 extracted,
                                 receipt.size_bytes,
