@@ -1,0 +1,44 @@
+name: M1 GDELT Real Sample
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/m1-gdelt-sample.yml"
+      - "pyproject.toml"
+      - "src/hello_gdelt/config.py"
+      - "src/hello_gdelt/cli.py"
+      - "src/hello_gdelt/gdelt/**"
+      - "src/hello_gdelt/validation/gdelt_sample.py"
+
+permissions:
+  contents: read
+
+jobs:
+  real-sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e '.[data]'
+      - name: Run local preflight
+        run: hello-gdelt preflight --root . --no-enforce-disk-gate
+      - name: Run verified GDELT trio through Parquet and DuckDB
+        run: >-
+          hello-gdelt gdelt-sample
+          --root .
+          --sample-rows 10000
+          --max-download-mb 1500
+          --min-free-disk-gb 10
+      - name: Upload gate reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1-gdelt-sample-report
+          path: reports/m1_*_report.*
+          if-no-files-found: warn
+          retention-days: 14
