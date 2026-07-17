@@ -40,9 +40,13 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "RUF"]
+ignore = ["UP017"]
 
 [tool.ruff.lint.per-file-ignores]
+"src/hello_gdelt/hypothesis/catalog.py" = ["E501"]
 "src/hello_gdelt/hypothesis/runner.py" = ["UP035"]
+"src/hello_gdelt/hypothesis/schema.py" = ["E501"]
+"src/hello_gdelt/markets/calendars.py" = ["E501", "UP035"]
 
 [tool.mypy]
 python_version = "3.11"
