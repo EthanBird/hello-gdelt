@@ -1,0 +1,44 @@
+version: 0.1.0
+reviewed_on: '2026-07-17'
+default_rule: Do not commit or redistribute third-party raw market data without explicit permission.
+entries:
+- source_id: GDELT_V2_RAW
+  research_use: ALLOWED_WITH_ATTRIBUTION
+  repository_distribution: METADATA_AND_SMALL_TEST_FIXTURES_ONLY
+  action: Proceed; preserve URLs, timestamps and hashes.
+- source_id: GDELT_DOC_API
+  research_use: ALLOWED_RATE_LIMITED
+  repository_distribution: QUERY_AND_DERIVED_AGGREGATES
+  action: Do not describe capped results as exhaustive.
+- source_id: SSE_SSEINFO
+  research_use: CONTRACT_REQUIRED_FOR_FULL_HISTORY
+  repository_distribution: NO_RAW
+  action: Use public summaries only for validation until licence is recorded.
+- source_id: SZSE_SSIC
+  research_use: CONTRACT_REQUIRED_FOR_FEEDS
+  repository_distribution: NO_RAW
+  action: Audit website terms and obtain licensed history for formal study.
+- source_id: KRX_DATA
+  research_use: TERMS_REVIEW_REQUIRED
+  repository_distribution: NO_BULK_RAW
+  action: Record exact menu/API/export and permitted use before ingestion.
+- source_id: JPX_DATA
+  research_use: PAID_FOR_TICK_OR_ORDER_BOOK
+  repository_distribution: NO_RAW
+  action: Public statistics may be used under terms; full history needs product agreement.
+- source_id: SEC_EDGAR
+  research_use: PUBLIC_ACCESS_POLICY
+  repository_distribution: DERIVED_AND_IDENTIFIERS
+  action: Comply with SEC automated access policy; prefer bulk archives for scale.
+- source_id: CME_MARKET_DATA
+  research_use: ILA_OR_VENDOR_LICENCE_REQUIRED
+  repository_distribution: NO_RAW
+  action: Formal results require licensed settlements/history and documented continuous-contract rules.
+- source_id: LBMA_BENCHMARKS
+  research_use: IBA_OR_LME_LICENCE_REQUIRED
+  repository_distribution: NO_RAW
+  action: Until licensed, use clearly named proxy; never label proxy as official LBMA benchmark.
+- source_id: ECB_EXR
+  research_use: PUBLIC_STATISTICAL_DATA
+  repository_distribution: DERIVED_AND_CITATION
+  action: Use for daily reference FX; disclose non-transactional nature.
