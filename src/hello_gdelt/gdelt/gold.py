@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import math
 import os
+from collections import Counter
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -70,20 +71,18 @@ def _source_entropy(frame: Any, source_column: str) -> tuple[float | None, int, 
     total_rows = frame.height
     if total_rows == 0:
         return None, 0, 0
-    missing_rows = int(_scalar(frame, frame[source_column].is_null().sum()))
-    counts = (
-        frame.select(source_column)
-        .with_columns(frame[source_column].fill_null("__MISSING_SOURCE__"))
-        .group_by(source_column)
-        .len()
+    raw_values = frame[source_column].to_list()
+    missing_rows = sum(value is None for value in raw_values)
+    counts = Counter(
+        "__MISSING_SOURCE__" if value is None else str(value)
+        for value in raw_values
     )
-    count_values = [int(value) for value in counts["len"].to_list()]
     entropy = -sum(
         (count / total_rows) * math.log(count / total_rows)
-        for count in count_values
+        for count in counts.values()
         if count > 0
     )
-    return entropy, len(count_values), missing_rows
+    return entropy, len(counts), missing_rows
 
 
 def build_news_interval_gold(
