@@ -25,6 +25,7 @@ class DailyBar:
     volume: float | None
     turnover: float | None
     price_adjustment_factor: float
+    adjustment_available_at_utc: datetime
     provider: str
     provider_series: str
     source_asof: str
@@ -53,6 +54,16 @@ def _utc(value: datetime, *, field: str) -> datetime:
     return normalized
 
 
+def _bar_information_time(bar: DailyBar) -> datetime:
+    return max(
+        _utc(bar.available_at_utc, field="available_at_utc"),
+        _utc(
+            bar.adjustment_available_at_utc,
+            field="adjustment_available_at_utc",
+        ),
+    )
+
+
 def validate_daily_bars(bars: tuple[DailyBar, ...]) -> tuple[DailyBar, ...]:
     if not bars:
         raise DailyMarketDataError("daily bar collection is empty")
@@ -71,11 +82,19 @@ def validate_daily_bars(bars: tuple[DailyBar, ...]) -> tuple[DailyBar, ...]:
         session_open = _utc(bar.session_open_utc, field="session_open_utc")
         session_close = _utc(bar.session_close_utc, field="session_close_utc")
         available = _utc(bar.available_at_utc, field="available_at_utc")
+        adjustment_available = _utc(
+            bar.adjustment_available_at_utc,
+            field="adjustment_available_at_utc",
+        )
         if session_open >= session_close:
             raise DailyMarketDataError(f"{identity}: session open must precede close")
         if available < session_close:
             raise DailyMarketDataError(
                 f"{identity}: bar cannot be available before the session closes"
+            )
+        if adjustment_available < session_close:
+            raise DailyMarketDataError(
+                f"{identity}: adjustment factor cannot be available before session close"
             )
         prices = (bar.open, bar.high, bar.low, bar.close, bar.price_adjustment_factor)
         if any(not math.isfinite(value) or value <= 0 for value in prices):
@@ -136,10 +155,12 @@ def compute_daily_returns(
     horizons: tuple[int, ...] = (1, 2, 5, 10, 20),
     as_of_utc: datetime | None = None,
 ) -> tuple[DailyReturn, ...]:
-    """Compute point-in-time adjusted returns without using unavailable bars.
+    """Compute point-in-time adjusted returns without using unavailable revisions.
 
-    `price_adjustment_factor` is a provider-supplied point-in-time multiplier applied
-    to all OHLC values. A future-revised total-return factor is not permitted.
+    `price_adjustment_factor` is a provider-supplied multiplier applied to all OHLC
+    values. Both the bar and factor availability times participate in the cutoff and
+    in the resulting return's information timestamp. Future-revised total-return
+    factors therefore cannot silently enter an earlier research snapshot.
     """
 
     ordered = validate_daily_bars(bars)
@@ -149,7 +170,7 @@ def compute_daily_returns(
     cutoff = None if as_of_utc is None else _utc(as_of_utc, field="as_of_utc")
     by_asset: dict[str, list[DailyBar]] = {}
     for bar in ordered:
-        if cutoff is not None and bar.available_at_utc.astimezone(UTC) > cutoff:
+        if cutoff is not None and _bar_information_time(bar) > cutoff:
             continue
         by_asset.setdefault(bar.asset_id, []).append(bar)
 
@@ -158,6 +179,7 @@ def compute_daily_returns(
         for index, bar in enumerate(asset_bars):
             adjusted_open = _adjusted(bar.open, bar.price_adjustment_factor)
             adjusted_close = _adjusted(bar.close, bar.price_adjustment_factor)
+            bar_information_time = _bar_information_time(bar)
             returns.append(
                 _return(
                     asset_id=asset_id,
@@ -166,7 +188,7 @@ def compute_daily_returns(
                     return_type="INTRADAY",
                     start_price=adjusted_open,
                     end_price=adjusted_close,
-                    available_at_utc=bar.available_at_utc.astimezone(UTC),
+                    available_at_utc=bar_information_time,
                     start_trading_date=bar.trading_date,
                     end_trading_date=bar.trading_date,
                 )
@@ -185,7 +207,10 @@ def compute_daily_returns(
                         return_type="OVERNIGHT",
                         start_price=previous_close,
                         end_price=adjusted_open,
-                        available_at_utc=bar.available_at_utc.astimezone(UTC),
+                        available_at_utc=max(
+                            _bar_information_time(previous),
+                            bar_information_time,
+                        ),
                         start_trading_date=previous.trading_date,
                         end_trading_date=bar.trading_date,
                     )
@@ -207,7 +232,10 @@ def compute_daily_returns(
                         return_type="CLOSE_TO_CLOSE",
                         start_price=adjusted_close,
                         end_price=end_close,
-                        available_at_utc=end_bar.available_at_utc.astimezone(UTC),
+                        available_at_utc=max(
+                            bar_information_time,
+                            _bar_information_time(end_bar),
+                        ),
                         start_trading_date=bar.trading_date,
                         end_trading_date=end_bar.trading_date,
                     )
