@@ -1,0 +1,69 @@
+version: 0.1.0
+reviewed_on: '2026-07-17'
+sources:
+- id: GDELT_V2_RAW
+  role: news_primary
+  authority: GDELT Project
+  access: public_raw
+  frequency: 15min
+  status: REQUIRED
+  url: https://data.gdeltproject.org/gdeltv2/lastupdate.txt
+  notes: Events 61 fields; EventMentions 16; GKG 27. Retain raw hash and source timestamp.
+- id: GDELT_DOC_API
+  role: article_discovery_and_audit
+  authority: GDELT Project
+  access: public_api
+  frequency: near_realtime
+  status: SUPPLEMENTARY
+  url: https://api.gdeltproject.org/api/v2/doc/doc
+  notes: ArtList is capped; never use as exhaustive article count.
+- id: SSE_SSEINFO
+  role: a_share_market
+  authority: Shanghai Stock Exchange / SSE InfoNet
+  access: licensed_or_public_summary
+  status: PAID_OR_RESTRICTED
+  url: https://english.sse.com.cn/markets/dataservice/products/
+- id: SZSE_SSIC
+  role: a_share_market
+  authority: Shenzhen Stock Exchange / SSIC
+  access: licensed_or_public_lookup
+  status: PAID_OR_RESTRICTED
+  url: https://www.szse.cn/English/services/dataServices/index.html
+- id: KRX_DATA
+  role: korea_market
+  authority: Korea Exchange
+  access: public_statistics_and_products
+  status: LICENCE_REVIEW
+  url: https://data.krx.co.kr/
+- id: JPX_DATA
+  role: japan_market
+  authority: Japan Exchange Group / JPXI
+  access: public_statistics_or_paid_history
+  status: PAID_FOR_GRANULAR
+  url: https://www.jpx.co.jp/english/markets/paid-info-equities/historical/
+- id: SEC_EDGAR
+  role: us_disclosures
+  authority: US SEC
+  access: public_api_no_key
+  status: AVAILABLE
+  url: https://www.sec.gov/search-filings/edgar-application-programming-interfaces
+  notes: Use declared User-Agent and comply with access policy.
+- id: CME_MARKET_DATA
+  role: futures_market
+  authority: CME Group
+  access: licensed
+  status: PAID_REQUIRED
+  url: https://www.cmegroup.com/market-data/browse-data/catalog/futures-and-options-data.html
+- id: LBMA_BENCHMARKS
+  role: london_precious_metals
+  authority: LBMA / IBA / LME
+  access: licensed
+  status: LICENCE_BLOCKED_UNTIL_APPROVED
+  url: https://www.lbma.org.uk/prices-and-data
+- id: ECB_EXR
+  role: fx_reference
+  authority: European Central Bank
+  access: public_sdmx
+  status: AVAILABLE_DAILY_REFERENCE
+  url: https://data-api.ecb.europa.eu/service/data/EXR/
+  notes: Reference rates are informational averages, not executable OTC prices.
