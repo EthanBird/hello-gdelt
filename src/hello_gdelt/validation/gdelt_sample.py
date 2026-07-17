@@ -45,6 +45,8 @@ class GdeltSampleReport:
     gate: Gate
     source_timestamp: str
     datasets: tuple[DatasetSampleResult, ...]
+    manifest_url: str | None = None
+    transport_security: Literal["HTTPS", "HTTP_FALLBACK", "UNKNOWN"] = "UNKNOWN"
     failure: str | None = None
 
     def to_json(self) -> str:
@@ -56,6 +58,8 @@ class GdeltSampleReport:
             "",
             f"生成时间（UTC）：`{self.generated_at_utc}`",
             f"源时间戳：`{self.source_timestamp}`",
+            f"清单地址：`{self.manifest_url or 'UNKNOWN'}`",
+            f"传输安全：**{self.transport_security}**",
             f"门禁：**{self.gate}**",
             "",
             "| 数据集 | 下载字节 | 抽样行 | 字段范围 | 坏行 | Parquet 行 | DuckDB 行 |",
@@ -143,16 +147,32 @@ def run_gdelt_latest_sample(
     limits: ResourceLimits | None = None,
     sample_rows: int = 10_000,
     user_agent: str = "hello-gdelt/0.1 research-validation",
+    allow_insecure_http: bool = False,
 ) -> GdeltSampleReport:
     limits = limits or ResourceLimits()
     paths = Paths.from_root(root)
     paths.ensure_runtime_dirs()
     generated_at = datetime.now(UTC).isoformat()
     source_timestamp = "UNKNOWN"
+    manifest_url: str | None = None
+    transport_security: Literal["HTTPS", "HTTP_FALLBACK", "UNKNOWN"] = "UNKNOWN"
     results: list[DatasetSampleResult] = []
     try:
         with httpx.Client(headers={"User-Agent": user_agent}) as client:
-            artifacts = fetch_latest_manifest(client, limits=limits)
+            try:
+                artifacts = fetch_latest_manifest(client, limits=limits)
+                manifest_url = "https://data.gdeltproject.org/gdeltv2/lastupdate.txt"
+                transport_security = "HTTPS"
+            except httpx.TransportError:
+                if not allow_insecure_http:
+                    raise
+                manifest_url = "http://data.gdeltproject.org/gdeltv2/lastupdate.txt"
+                artifacts = fetch_latest_manifest(
+                    client,
+                    limits=limits,
+                    url=manifest_url,
+                )
+                transport_security = "HTTP_FALLBACK"
             total_download_bytes = sum(artifact.size_bytes for artifact in artifacts)
             if total_download_bytes > limits.max_download_bytes:
                 raise RuntimeError(
@@ -215,6 +235,8 @@ def run_gdelt_latest_sample(
             gate="GO",
             source_timestamp=source_timestamp,
             datasets=tuple(results),
+            manifest_url=manifest_url,
+            transport_security=transport_security,
         )
     except Exception as exc:
         return GdeltSampleReport(
@@ -222,6 +244,8 @@ def run_gdelt_latest_sample(
             gate="NO_GO",
             source_timestamp=source_timestamp,
             datasets=tuple(results),
+            manifest_url=manifest_url,
+            transport_security=transport_security,
             failure=f"{type(exc).__name__}: {exc}",
         )
 
