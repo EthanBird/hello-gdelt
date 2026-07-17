@@ -16,5 +16,21 @@ jobs:
           cache: pip
       - run: python -m pip install --upgrade pip
       - run: pip install -e '.[dev]'
-      - run: ruff check src tests
+      - name: Run Ruff and preserve diagnostics
+        id: ruff
+        continue-on-error: true
+        run: |
+          mkdir -p reports
+          ruff check src tests --output-format=json > reports/ruff.json
       - run: pytest
+      - name: Upload lint diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ruff-diagnostics
+          path: reports/ruff.json
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Enforce Ruff result
+        if: steps.ruff.outcome == 'failure'
+        run: exit 1
