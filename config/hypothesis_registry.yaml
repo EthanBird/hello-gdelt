@@ -1,0 +1,91 @@
+version: 0.1.0
+frozen_on: '2026-07-17'
+status: LOCKED
+confirmatory_count: 96
+id_rule: H{1-based index:03d}; family-major then market-group order
+market_groups:
+- A_SHARE
+- KOREA
+- JAPAN
+- US_EQUITY
+- CME
+- LONDON_PROXY
+- FX
+- CROSS_MARKET
+common:
+  primary_horizons:
+  - 0
+  - 1
+  - 5
+  sample_design: design 2015-2019; tune 2020-2022; validate 2023-2024; final 2025-2026H1
+  fdr_levels:
+  - family
+  - market
+  - global
+  required_placebos:
+  - date_block
+  - entity_or_asset
+  - reverse_time
+  decision_rule: global_q<=0.05 plus economic_significance plus placebo_pass
+expansion: Cartesian product of families x market_groups. No cell may be removed after final-sample inspection.
+families:
+- family: ATTENTION
+  exposure: attention_z
+  outcome: abnormal_volume_or_abs_return
+  expected_direction: positive
+  primary_model: PanelFixedEffectRunner
+- family: NEGATIVE_ASYMMETRY
+  exposure: tone_negative_share
+  outcome: return_and_volatility
+  expected_direction: negative_return_positive_vol
+  primary_model: PanelFixedEffectRunner
+- family: NOVELTY
+  exposure: novelty_score
+  outcome: return_and_volume
+  expected_direction: stronger_than_duplicate
+  primary_model: EventStudyRunner
+- family: SOURCE_DIVERSITY
+  exposure: source_entropy
+  outcome: abs_return_and_volume
+  expected_direction: positive
+  primary_model: PanelFixedEffectRunner
+- family: DOMESTIC_FOREIGN_GAP
+  exposure: domestic_foreign_tone_gap
+  outcome: return_and_flow
+  expected_direction: market_specific
+  primary_model: PanelFixedEffectRunner
+- family: GEOPOLITICAL_SAFE_HAVEN
+  exposure: conflict_intensity
+  outcome: safe_haven_and_risk_assets
+  expected_direction: safe_haven_positive_risk_negative
+  primary_model: LocalProjectionRunner
+- family: MONETARY_POLICY
+  exposure: hawkishness
+  outcome: rates_fx_growth_equity
+  expected_direction: theory_signed
+  primary_model: LocalProjectionRunner
+- family: INFLATION_GROWTH
+  exposure: inflation_growth_narrative
+  outcome: cross_asset_return
+  expected_direction: state_dependent
+  primary_model: PanelFixedEffectRunner
+- family: ENERGY_SUPPLY
+  exposure: energy_supply_shock
+  outcome: energy_futures_and_equities
+  expected_direction: signed_by_exposure
+  primary_model: LocalProjectionRunner
+- family: AGRICULTURE_WEATHER
+  exposure: agri_weather_shock
+  outcome: grain_futures
+  expected_direction: positive_volatility
+  primary_model: EventStudyRunner
+- family: COMPANY_NEWS
+  exposure: company_specific_news
+  outcome: abnormal_return
+  expected_direction: signed_by_news
+  primary_model: EventStudyRunner
+- family: STATE_DEPENDENCE
+  exposure: news_x_market_state
+  outcome: return_volatility_tail
+  expected_direction: nonlinear
+  primary_model: QuantileRunner

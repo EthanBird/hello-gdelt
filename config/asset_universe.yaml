@@ -1,0 +1,131 @@
+version: 0.1.0
+frozen_on: '2026-07-17'
+expected_asset_count: 103
+point_in_time_required: true
+gate: 'Every asset remains PENDING_DATA_AUDIT until licence, history, liquidity and timestamp checks pass.'
+columns: [asset_id, name, asset_type, provider_symbol, exchange, timezone, currency, primary_source, proxy]
+market_groups:
+  A_SHARE:
+    defaults: {"timezone":"Asia/Shanghai","currency":"CNY","proxy":false}
+    assets:
+      - ["CHN_CSI300","CSI 300","index",null,"CSI","Asia/Shanghai","CNY","SSE_SSEINFO_OR_LICENSED",false]
+      - ["CHN_SSE50","SSE 50","index",null,"SSE","Asia/Shanghai","CNY","SSE_SSEINFO_OR_LICENSED",false]
+      - ["CHN_CHINEXT","ChiNext Index","index",null,"SZSE","Asia/Shanghai","CNY","SZSE_SSIC_OR_LICENSED",false]
+      - ["CHN_STAR50","STAR 50","index",null,"SSE","Asia/Shanghai","CNY","SSE_SSEINFO_OR_LICENSED",false]
+      - ["SSE_600519","Kweichow Moutai","equity","600519","SSE","Asia/Shanghai","CNY","SSE_SSEINFO_OR_LICENSED",false]
+      - ["SSE_601318","Ping An Insurance","equity","601318","SSE","Asia/Shanghai","CNY","SSE_SSEINFO_OR_LICENSED",false]
+      - ["SSE_600036","China Merchants Bank","equity","600036","SSE","Asia/Shanghai","CNY","SSE_SSEINFO_OR_LICENSED",false]
+      - ["SSE_601857","PetroChina","equity","601857","SSE","Asia/Shanghai","CNY","SSE_SSEINFO_OR_LICENSED",false]
+      - ["SSE_600276","Jiangsu Hengrui","equity","600276","SSE","Asia/Shanghai","CNY","SSE_SSEINFO_OR_LICENSED",false]
+      - ["SSE_688981","SMIC STAR","equity","688981","SSE","Asia/Shanghai","CNY","SSE_SSEINFO_OR_LICENSED",false]
+      - ["SZSE_000858","Wuliangye","equity","000858","SZSE","Asia/Shanghai","CNY","SZSE_SSIC_OR_LICENSED",false]
+      - ["SZSE_000333","Midea Group","equity","000333","SZSE","Asia/Shanghai","CNY","SZSE_SSIC_OR_LICENSED",false]
+      - ["SZSE_002594","BYD","equity","002594","SZSE","Asia/Shanghai","CNY","SZSE_SSIC_OR_LICENSED",false]
+      - ["SZSE_300750","CATL","equity","300750","SZSE","Asia/Shanghai","CNY","SZSE_SSIC_OR_LICENSED",false]
+      - ["SZSE_002475","Luxshare Precision","equity","002475","SZSE","Asia/Shanghai","CNY","SZSE_SSIC_OR_LICENSED",false]
+      - ["SZSE_000001","Ping An Bank","equity","000001","SZSE","Asia/Shanghai","CNY","SZSE_SSIC_OR_LICENSED",false]
+  KOREA:
+    defaults: {"exchange":"KRX","timezone":"Asia/Seoul","currency":"KRW","primary_source":"KRX_DATA_MARKETPLACE","proxy":false}
+    assets:
+      - ["KOR_KOSPI","KOSPI","index",null,"KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KOR_KOSPI200","KOSPI 200","index",null,"KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KOR_KOSDAQ","KOSDAQ","index",null,"KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KRX_005930","Samsung Electronics","equity","005930","KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KRX_000660","SK Hynix","equity","000660","KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KRX_005380","Hyundai Motor","equity","005380","KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KRX_035420","NAVER","equity","035420","KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KRX_035720","Kakao","equity","035720","KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KRX_051910","LG Chem","equity","051910","KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KRX_006400","Samsung SDI","equity","006400","KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KRX_207940","Samsung Biologics","equity","207940","KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KRX_068270","Celltrion","equity","068270","KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+      - ["KRX_105560","KB Financial","equity","105560","KRX","Asia/Seoul","KRW","KRX_DATA_MARKETPLACE",false]
+  JAPAN:
+    defaults: {"exchange":"JPX","timezone":"Asia/Tokyo","currency":"JPY","primary_source":"JPX_FREE_OR_LICENSED","proxy":false}
+    assets:
+      - ["JPN_TOPIX","TOPIX","index",null,"JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["JPN_NIKKEI225","Nikkei 225","index",null,"JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["JPN_GROWTH","TSE Growth Market Index","index",null,"JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["TSE_7203","Toyota Motor","equity","7203","JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["TSE_6758","Sony Group","equity","6758","JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["TSE_8306","Mitsubishi UFJ","equity","8306","JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["TSE_9984","SoftBank Group","equity","9984","JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["TSE_8035","Tokyo Electron","equity","8035","JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["TSE_6861","Keyence","equity","6861","JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["TSE_9983","Fast Retailing","equity","9983","JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["TSE_6501","Hitachi","equity","6501","JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["TSE_9432","NTT","equity","9432","JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+      - ["TSE_4502","Takeda Pharmaceutical","equity","4502","JPX","Asia/Tokyo","JPY","JPX_FREE_OR_LICENSED",false]
+  US_EQUITY:
+    defaults: {"exchange":"NYSE_NASDAQ","timezone":"America/New_York","currency":"USD","primary_source":"LICENSED_US_MARKET_DATA","proxy":false}
+    assets:
+      - ["US_SP500","S&P 500","index",null,"NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_NDX100","Nasdaq 100","index",null,"NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_RUSSELL2000","Russell 2000","index",null,"NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_XLK","Technology Select Sector ETF","etf","XLK","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_XLF","Financial Select Sector ETF","etf","XLF","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_XLE","Energy Select Sector ETF","etf","XLE","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_XLI","Industrial Select Sector ETF","etf","XLI","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_XLY","Consumer Discretionary ETF","etf","XLY","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_XLP","Consumer Staples ETF","etf","XLP","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_XLV","Health Care Select Sector ETF","etf","XLV","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_XLU","Utilities Select Sector ETF","etf","XLU","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_AAPL","Apple","equity","AAPL","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_MSFT","Microsoft","equity","MSFT","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_NVDA","NVIDIA","equity","NVDA","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_AMZN","Amazon","equity","AMZN","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_GOOGL","Alphabet","equity","GOOGL","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_META","Meta Platforms","equity","META","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_TSLA","Tesla","equity","TSLA","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_JPM","JPMorgan Chase","equity","JPM","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_XOM","Exxon Mobil","equity","XOM","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_UNH","UnitedHealth","equity","UNH","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_CAT","Caterpillar","equity","CAT","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_WMT","Walmart","equity","WMT","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+      - ["US_BA","Boeing","equity","BA","NYSE_NASDAQ","America/New_York","USD","LICENSED_US_MARKET_DATA",false]
+  CME:
+    defaults: {"exchange":"CME_GROUP","timezone":"America/Chicago","currency":"USD","primary_source":"CME_LICENSED_DATA","proxy":false}
+    assets:
+      - ["CME_ES","E-mini S&P 500","future","ES","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["CME_NQ","E-mini Nasdaq-100","future","NQ","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["CME_RTY","E-mini Russell 2000","future","RTY","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["CBOT_ZN","10-Year T-Note","future","ZN","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["CBOT_ZB","30-Year T-Bond","future","ZB","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["NYMEX_CL","WTI Crude Oil","future","CL","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["NYMEX_NG","Henry Hub Natural Gas","future","NG","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["COMEX_GC","Gold","future","GC","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["COMEX_SI","Silver","future","SI","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["COMEX_HG","Copper","future","HG","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["CBOT_ZC","Corn","future","ZC","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["CBOT_ZW","Wheat","future","ZW","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["CBOT_ZS","Soybeans","future","ZS","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["CME_6E","Euro FX","future","6E","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+      - ["CME_6J","Japanese Yen","future","6J","CME_GROUP","America/Chicago","USD","CME_LICENSED_DATA",false]
+  LONDON_PROXY:
+    defaults: {"exchange":"OTC_OR_PROXY","timezone":"Europe/London","currency":"USD","primary_source":"LICENSED_VENDOR_OR_EXPLICIT_PROXY","proxy":true}
+    assets:
+      - ["LONDON_GOLD_PROXY","London gold spot proxy","spot_proxy","XAUUSD","OTC_OR_PROXY","Europe/London","USD","LICENSED_VENDOR_OR_EXPLICIT_PROXY",true]
+      - ["LONDON_SILVER_PROXY","London silver spot proxy","spot_proxy","XAGUSD","OTC_OR_PROXY","Europe/London","USD","LICENSED_VENDOR_OR_EXPLICIT_PROXY",true]
+      - ["LONDON_COPPER_PROXY","London copper proxy","spot_proxy","LME_COPPER_PROXY","OTC_OR_PROXY","Europe/London","USD","LICENSED_VENDOR_OR_EXPLICIT_PROXY",true]
+      - ["LONDON_BRENT_PROXY","Brent crude proxy","spot_proxy","BRENT_PROXY","OTC_OR_PROXY","Europe/London","USD","LICENSED_VENDOR_OR_EXPLICIT_PROXY",true]
+      - ["LONDON_PLATINUM_PROXY","London platinum proxy","spot_proxy","XPTUSD","OTC_OR_PROXY","Europe/London","USD","LICENSED_VENDOR_OR_EXPLICIT_PROXY",true]
+      - ["LONDON_PALLADIUM_PROXY","London palladium proxy","spot_proxy","XPDUSD","OTC_OR_PROXY","Europe/London","USD","LICENSED_VENDOR_OR_EXPLICIT_PROXY",true]
+  FX:
+    defaults: {"exchange":"OTC_REFERENCE","timezone":"Europe/Berlin","currency":"MIXED","primary_source":"ECB_SDMX_OR_LICENSED_FX","proxy":false}
+    assets:
+      - ["FX_EURUSD","EURUSD","fx","EURUSD","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_USDJPY","USDJPY","fx","USDJPY","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_GBPUSD","GBPUSD","fx","GBPUSD","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_USDCHF","USDCHF","fx","USDCHF","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_USDCNY","USDCNY","fx","USDCNY","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_USDKRW","USDKRW","fx","USDKRW","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_AUDUSD","AUDUSD","fx","AUDUSD","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_NZDUSD","NZDUSD","fx","NZDUSD","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_USDCAD","USDCAD","fx","USDCAD","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_USDSEK","USDSEK","fx","USDSEK","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_USDNOK","USDNOK","fx","USDNOK","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_USDINR","USDINR","fx","USDINR","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_USDSGD","USDSGD","fx","USDSGD","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_USDHKD","USDHKD","fx","USDHKD","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_EURJPY","EURJPY","fx","EURJPY","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]
+      - ["FX_EURGBP","EURGBP","fx","EURGBP","OTC_REFERENCE","Europe/Berlin","MIXED","ECB_SDMX_OR_LICENSED_FX",false]

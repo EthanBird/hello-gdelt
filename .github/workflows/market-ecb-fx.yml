@@ -1,0 +1,52 @@
+name: Market ECB FX Sample
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/market-ecb-fx.yml"
+      - "pyproject.toml"
+      - "src/hello_gdelt/cli.py"
+      - "src/hello_gdelt/config.py"
+      - "src/hello_gdelt/markets/ecb_fx.py"
+      - "src/hello_gdelt/validation/ecb_fx_sample.py"
+      - "tests/test_ecb_fx.py"
+
+concurrency:
+  group: market-ecb-fx-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  official-reference-rates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e '.[data]'
+      - name: Fetch official ECB EXR and derive frozen FX panel
+        run: >-
+          hello-gdelt ecb-fx-sample
+          --root .
+          --start-date 2026-06-01
+          --end-date 2026-07-16
+      - name: Replay exact ECB response window
+        run: >-
+          hello-gdelt ecb-fx-sample
+          --root .
+          --start-date 2026-06-01
+          --end-date 2026-07-16
+      - name: Upload source-gate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-ecb-fx-report
+          path: reports/market_ecb_fx_sample_report.*
+          if-no-files-found: warn
+          retention-days: 14

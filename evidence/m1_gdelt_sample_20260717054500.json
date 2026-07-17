@@ -1,0 +1,57 @@
+{
+  "evidence_version": "1.0",
+  "validation_environment": "GitHub Actions Ubuntu 24.04 / Python 3.11.15",
+  "generated_at_utc": "2026-07-17T05:43:00.052416+00:00",
+  "source_timestamp": "20260717054500",
+  "manifest_url": "http://data.gdeltproject.org/gdeltv2/lastupdate.txt",
+  "transport_security": "HTTP_FALLBACK",
+  "sample_pipeline_gate": "GO",
+  "overall_m1_gate": "CONDITIONAL_GO",
+  "limitations": [
+    "GDELT HTTPS endpoint failed hostname validation in the independent runner.",
+    "The HTTP manifest and files are integrity-checked but the transport does not authenticate the publisher.",
+    "The CI runner had about 94GB free disk, below the target-machine 300GB gate.",
+    "This evidence validates one current 15-minute engineering sample, not historical completeness or a financial hypothesis."
+  ],
+  "datasets": [
+    {
+      "dataset": "events",
+      "archive_filename": "20260717054500.export.CSV.zip",
+      "downloaded_bytes": 44283,
+      "archive_md5": "a2dbef247469494cfce3d7a5dd0b083c",
+      "archive_sha256": "b011bf0b90ea20e537abc16a68b615ad0afde78fbfcfebebb74726bd4aee7ddf",
+      "sampled_rows": 695,
+      "minimum_columns": 61,
+      "maximum_columns": 61,
+      "malformed_rows": 0,
+      "parquet_rows": 695,
+      "duckdb_rows": 695
+    },
+    {
+      "dataset": "gkg",
+      "archive_filename": "20260717054500.gkg.csv.zip",
+      "downloaded_bytes": 3373100,
+      "archive_md5": "792b07e06a1264efa55ebfc597162314",
+      "archive_sha256": "f887f8f32afb4f27b96f80066f41c017df0d853fcc1a361e1054bc39829939e5",
+      "sampled_rows": 864,
+      "minimum_columns": 27,
+      "maximum_columns": 27,
+      "malformed_rows": 0,
+      "parquet_rows": 864,
+      "duckdb_rows": 864
+    },
+    {
+      "dataset": "mentions",
+      "archive_filename": "20260717054500.mentions.CSV.zip",
+      "downloaded_bytes": 65814,
+      "archive_md5": "026938a1042f8ebbb7dfa3b3cadb52f0",
+      "archive_sha256": "2995c746396fba917e8c8f406ff34649bbdabc5f3891d5b819e441f9519ee9bb",
+      "sampled_rows": 2181,
+      "minimum_columns": 16,
+      "maximum_columns": 16,
+      "malformed_rows": 0,
+      "parquet_rows": 2181,
+      "duckdb_rows": 2181
+    }
+  ]
+}
