@@ -3,6 +3,8 @@ from __future__ import annotations
 import csv
 import io
 from dataclasses import dataclass
+from pathlib import Path
+from typing import TextIO
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,7 +40,7 @@ class DelimitedValidation:
         )
 
 
-def validate_tsv_sample(dataset: str, text: str, *, max_rows: int = 10_000) -> DelimitedValidation:
+def _validate_reader(dataset: str, handle: TextIO, *, max_rows: int) -> DelimitedValidation:
     if dataset not in CONTRACTS:
         raise KeyError(f"unknown dataset contract: {dataset}")
     if max_rows <= 0:
@@ -49,7 +51,7 @@ def validate_tsv_sample(dataset: str, text: str, *, max_rows: int = 10_000) -> D
     malformed = 0
     min_columns = 10**9
     max_columns = 0
-    reader = csv.reader(io.StringIO(text), delimiter="\t", quoting=csv.QUOTE_NONE)
+    reader = csv.reader(handle, delimiter="\t", quoting=csv.QUOTE_NONE)
     for row in reader:
         if not row:
             continue
@@ -71,3 +73,17 @@ def validate_tsv_sample(dataset: str, text: str, *, max_rows: int = 10_000) -> D
         maximum_columns=max_columns,
         malformed_rows=malformed,
     )
+
+
+def validate_tsv_sample(dataset: str, text: str, *, max_rows: int = 10_000) -> DelimitedValidation:
+    return _validate_reader(dataset, io.StringIO(text), max_rows=max_rows)
+
+
+def validate_tsv_file(
+    dataset: str,
+    path: Path,
+    *,
+    max_rows: int = 10_000,
+) -> DelimitedValidation:
+    with path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
+        return _validate_reader(dataset, handle, max_rows=max_rows)
