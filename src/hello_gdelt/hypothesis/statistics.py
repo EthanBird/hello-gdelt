@@ -35,21 +35,27 @@ def fit_ols(x: FloatArray, y: FloatArray) -> OLSResult:
     if not np.isfinite(x).all() or not np.isfinite(y).all():
         raise ValueError("x and y must contain only finite values")
 
-    coefficients, _, rank, singular_values = np.linalg.lstsq(x, y, rcond=None)
-    predictions = x @ coefficients
-    residuals = y - predictions
+    raw_coefficients, _, rank, singular_values = np.linalg.lstsq(x, y, rcond=None)
+    coefficients = np.asarray(raw_coefficients, dtype=np.float64)
+    predictions = np.asarray(x @ coefficients, dtype=np.float64)
+    residuals = np.asarray(y - predictions, dtype=np.float64)
     degrees_freedom = max(1, x.shape[0] - rank)
     sigma_squared = float(residuals @ residuals) / degrees_freedom
     covariance = sigma_squared * np.linalg.pinv(x.T @ x)
     variances = np.maximum(np.diag(covariance), 0.0)
-    standard_errors = np.sqrt(variances)
-    t_values = np.divide(
-        coefficients,
-        standard_errors,
-        out=np.zeros_like(coefficients),
-        where=standard_errors > 0,
+    standard_errors = np.asarray(np.sqrt(variances), dtype=np.float64)
+    t_values = np.asarray(
+        np.divide(
+            coefficients,
+            standard_errors,
+            out=np.zeros_like(coefficients),
+            where=standard_errors > 0,
+        ),
+        dtype=np.float64,
     )
-    p_values = np.asarray([_normal_two_sided_p(float(value)) for value in t_values])
+    p_values = np.asarray(
+        [_normal_two_sided_p(float(value)) for value in t_values], dtype=np.float64
+    )
     condition_number = (
         float(singular_values[0] / singular_values[-1])
         if singular_values.size and singular_values[-1] > 0
