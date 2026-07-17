@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 import typer
 
 from hello_gdelt.config import ResourceLimits
+from hello_gdelt.validation.ecb_fx_sample import (
+    run_ecb_fx_sample,
+    write_ecb_fx_sample_report,
+)
 from hello_gdelt.validation.gdelt_sample import (
     run_gdelt_latest_sample,
     write_gdelt_sample_report,
@@ -43,7 +48,7 @@ def gdelt_sample(
         help="Explicitly allow the legacy unauthenticated HTTP GDELT raw endpoint",
     ),
 ) -> None:
-    """Download and validate one real aligned GDELT trio through DuckDB."""
+    """Download and validate one real aligned GDELT trio through Gold and DuckDB."""
 
     limits = ResourceLimits(
         max_download_bytes=max_download_mb * 1_000_000,
@@ -56,6 +61,36 @@ def gdelt_sample(
         allow_insecure_http=allow_insecure_http,
     )
     json_path, markdown_path = write_gdelt_sample_report(report, root / "reports")
+    typer.echo(report.to_markdown())
+    typer.echo(f"JSON: {json_path}")
+    typer.echo(f"Markdown: {markdown_path}")
+    raise typer.Exit(code=0 if report.gate == "GO" else 2)
+
+
+@app.command("ecb-fx-sample")
+def ecb_fx_sample(
+    root: Path = typer.Option(Path.cwd(), help="Repository/runtime root"),
+    start_date: str | None = typer.Option(
+        None,
+        help="Inclusive ISO date; defaults to lookback-days before end-date",
+    ),
+    end_date: str | None = typer.Option(
+        None,
+        help="Inclusive ISO date; defaults to yesterday UTC",
+    ),
+    lookback_days: int = typer.Option(45, min=7, max=366),
+) -> None:
+    """Validate official ECB EXR data and derive the frozen 16-pair FX panel."""
+
+    parsed_start = None if start_date is None else date.fromisoformat(start_date)
+    parsed_end = None if end_date is None else date.fromisoformat(end_date)
+    report = run_ecb_fx_sample(
+        root,
+        start_date=parsed_start,
+        end_date=parsed_end,
+        lookback_days=lookback_days,
+    )
+    json_path, markdown_path = write_ecb_fx_sample_report(report, root / "reports")
     typer.echo(report.to_markdown())
     typer.echo(f"JSON: {json_path}")
     typer.echo(f"Markdown: {markdown_path}")
