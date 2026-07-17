@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "sources": [
+    {
+      "source_id": "gdelt_doc_v2",
+      "provider": "GDELT Project",
+      "role": "news_factor",
+      "grade": "A_for_public_news_aggregate",
+      "access": "public_no_key",
+      "limitations": ["DOC API search horizon and availability constraints", "media coverage bias", "machine coding and tone noise"]
+    },
+    {
+      "source_id": "yahoo_finance_pilot",
+      "provider": "Yahoo Finance through yfinance",
+      "role": "pilot_market_prices",
+      "grade": "C_pilot_only",
+      "access": "public_client",
+      "limitations": ["not licensed for redistribution", "possible delays and symbol gaps", "continuous futures construction is provider-defined"]
+    },
+    {
+      "source_id": "exchange_or_benchmark_production",
+      "provider": "SSE/SZSE/JPX/KRX/SEC/CME/LBMA/ECB or licensed vendor",
+      "role": "production_confirmation",
+      "grade": "A_or_B",
+      "access": "mixed_public_and_licensed",
+      "limitations": ["some series require paid licences", "raw licensed data must not be committed to GitHub"]
+    }
+  ]
+}

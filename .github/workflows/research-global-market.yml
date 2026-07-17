@@ -1,0 +1,77 @@
+name: Research - GDELT Global Market Pilot
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "research/global_market_pilot/**"
+      - "configs/research/**"
+      - "src/hello_gdelt/hypothesis/statistics.py"
+      - ".github/workflows/research-global-market.yml"
+
+concurrency:
+  group: gdelt-global-market-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  global-market-pilot:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install research dependencies
+        run: |
+          python -m pip install --upgrade pip --quiet
+          python -m pip install -e . pandas statsmodels matplotlib yfinance requests --quiet
+      - name: Run preregistered pilot and preserve logs
+        continue-on-error: true
+        env:
+          MPLBACKEND: Agg
+          RESEARCH_OUTPUT: research_output_global_market
+        run: |
+          mkdir -p research_output_global_market
+          set +e
+          python research/global_market_pilot/run_pilot_resilient.py \
+            > research_output_global_market/run.log 2>&1
+          status=$?
+          echo "$status" > research_output_global_market/exit_code.txt
+          cat research_output_global_market/run.log
+          exit 0
+      - name: Show summary when available
+        if: always()
+        run: |
+          if test -s research_output_global_market/summary.json; then
+            python -m json.tool research_output_global_market/summary.json
+          fi
+          if test -s research_output_global_market/pilot_report_cn.md; then
+            sed -n '1,240p' research_output_global_market/pilot_report_cn.md
+          fi
+      - name: Upload reproducibility and diagnostic bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gdelt-global-market-pilot
+          path: research_output_global_market/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Enforce research success and reproducibility outputs
+        if: always()
+        run: |
+          test -s research_output_global_market/exit_code.txt
+          test "$(cat research_output_global_market/exit_code.txt)" = "0"
+          test -s research_output_global_market/source_audit.json
+          test -s research_output_global_market/market_prices.csv
+          test -s research_output_global_market/gdelt_factors.csv
+          test -s research_output_global_market/analysis_panel.csv
+          test -s research_output_global_market/result_registry.csv
+          test -s research_output_global_market/summary.json
+          test -s research_output_global_market/pilot_report_cn.md
+          test -s research_output_global_market/fig01_asset_coverage.png
+          test -s research_output_global_market/fig02_gdelt_factor_shocks.png

@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "source": "GDELT DOC 2.0 API",
+  "factors": [
+    {"factor_id": "us_monetary_policy", "query": "(\"Federal Reserve\" OR FOMC OR \"interest rates\")", "family": "monetary_policy"},
+    {"factor_id": "global_geopolitical_conflict", "query": "(war OR sanctions OR \"military conflict\")", "family": "geopolitics"},
+    {"factor_id": "energy_supply", "query": "(OPEC OR \"oil supply\" OR \"crude oil\")", "family": "energy"},
+    {"factor_id": "inflation_pressure", "query": "(inflation OR \"consumer prices\")", "family": "macro"},
+    {"factor_id": "china_growth", "query": "(\"China economy\" OR \"China growth\" OR \"Chinese economy\")", "family": "china_macro"},
+    {"factor_id": "ai_semiconductors", "query": "(\"artificial intelligence\" OR semiconductor OR chip)", "family": "technology"}
+  ],
+  "features_per_factor": ["article_count", "article_share", "average_tone", "count_shock_z", "tone_shock_z"],
+  "alignment_rule": "Use the previous UTC daily bucket for every market in the pilot to prevent same-session look-ahead. The production study will replace this with exchange-session-aware alignment."
+}
