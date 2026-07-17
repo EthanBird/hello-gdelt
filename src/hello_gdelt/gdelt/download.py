@@ -24,6 +24,7 @@ class DownloadReceipt:
     path: Path
     size_bytes: int
     md5: str
+    sha256: str
     reused: bool
 
 
@@ -41,14 +42,20 @@ def fetch_latest_manifest(
     return parse_lastupdate(response.text)
 
 
-def _md5_file(path: Path, *, chunk_size: int = 1024 * 1024) -> tuple[str, int]:
-    digest = hashlib.md5(usedforsecurity=False)
+def _hash_file(
+    path: Path,
+    *,
+    chunk_size: int = 1024 * 1024,
+) -> tuple[str, str, int]:
+    md5_digest = hashlib.md5(usedforsecurity=False)
+    sha256_digest = hashlib.sha256()
     size = 0
     with path.open("rb") as handle:
         while chunk := handle.read(chunk_size):
-            digest.update(chunk)
+            md5_digest.update(chunk)
+            sha256_digest.update(chunk)
             size += len(chunk)
-    return digest.hexdigest(), size
+    return md5_digest.hexdigest(), sha256_digest.hexdigest(), size
 
 
 def download_artifact(
@@ -73,13 +80,14 @@ def download_artifact(
     part_path = destination_dir / f".{filename}.part"
 
     if final_path.exists():
-        md5, size = _md5_file(final_path)
+        md5, sha256, size = _hash_file(final_path)
         if size == artifact.size_bytes and md5 == artifact.md5:
-            return DownloadReceipt(final_path, size, md5, True)
+            return DownloadReceipt(final_path, size, md5, sha256, True)
         raise DownloadError(f"existing artifact failed manifest verification: {final_path}")
 
     part_path.unlink(missing_ok=True)
-    digest = hashlib.md5(usedforsecurity=False)
+    md5_digest = hashlib.md5(usedforsecurity=False)
+    sha256_digest = hashlib.sha256()
     downloaded = 0
     try:
         with client.stream(
@@ -109,12 +117,14 @@ def download_artifact(
                         raise DownloadError("download exceeded manifest byte size")
                     if downloaded > limits.max_download_bytes:
                         raise DownloadError("download exceeded configured byte limit")
-                    digest.update(chunk)
+                    md5_digest.update(chunk)
+                    sha256_digest.update(chunk)
                     handle.write(chunk)
                 handle.flush()
                 os.fsync(handle.fileno())
 
-        actual_md5 = digest.hexdigest()
+        actual_md5 = md5_digest.hexdigest()
+        actual_sha256 = sha256_digest.hexdigest()
         if downloaded != artifact.size_bytes:
             raise DownloadError(
                 f"download byte mismatch: actual={downloaded}, manifest={artifact.size_bytes}"
@@ -124,7 +134,13 @@ def download_artifact(
                 f"download MD5 mismatch: actual={actual_md5}, manifest={artifact.md5}"
             )
         os.replace(part_path, final_path)
-        return DownloadReceipt(final_path, downloaded, actual_md5, False)
+        return DownloadReceipt(
+            final_path,
+            downloaded,
+            actual_md5,
+            actual_sha256,
+            False,
+        )
     except Exception:
         part_path.unlink(missing_ok=True)
         raise
