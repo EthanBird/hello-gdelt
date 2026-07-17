@@ -6,13 +6,16 @@
 
 ## 当前状态
 
-当前为 `v0.1 / 设计基线阶段`：
+当前为 `v0.1 / 开发前验证与全球市场研究协议阶段`：
 
-- 已完成数学建模定义；
-- 已完成单机工程架构设计；
-- 已完成开发前验证方案；
-- 尚未宣称任何数据接入、指标或模型已经实现；
-- 正式开发必须先通过开发前 `GO / CONDITIONAL GO / NO-GO` 门禁。
+- 已完成数学建模定义、单机工程架构和开发前验证方案；
+- 已冻结 103 个资产的多市场研究池和 96 个确认性假设单元；
+- 已登记主要数据源、许可和再分发边界；
+- 已实现本地 M1 preflight、GDELT `lastupdate.txt` 契约、三表字段数验证、受限下载和安全解压；
+- 已加入冻结注册表漂移测试和 GitHub Actions CI；
+- 真实 GDELT ZIP → Bronze Parquet → DuckDB → Gold 的目标机器闭环仍须通过，尚未宣称任何金融假设得到支持。
+
+研究开发位于 `research/global-news-market-v0.1` 分支。在 M1 获得 `GO` 或明确接受的 `CONDITIONAL GO` 前，不进入正式模型裁决。
 
 ## V1 目标
 
@@ -26,7 +29,7 @@
 - FastAPI 查询层与受限 MCP 工具层；
 - 从指标到原始证据、配置、代码和实验结果的可追溯链路。
 
-V1 的建议范围为 50–80 个国家、8–12 类关系、8 个核心主题，先做日频指数、面板回归和离散事件传播，不做全量 GDELT 本地镜像。
+V1 的基础世界模型建议范围为 50–80 个国家、8–12 类关系、8 个核心主题。全球新闻—市场研究另设 103 个对象的冻结资产池，以日频为主、合法分钟数据子集为辅，不做全量 GDELT 本地镜像。
 
 ## 核心架构
 
@@ -59,6 +62,19 @@ GDELT raw / DOC API / BigQuery controlled backfill
 | 测试 | pytest + 数据契约检查 |
 | 调参 | Optuna（按需引入） |
 
+## 快速验证
+
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -e '.[data,research,dev]'
+hello-gdelt preflight --root .
+pytest
+```
+
+`preflight` 只检查本机依赖、磁盘、SQLite 和运行目录。真实数据门禁还必须完成 GDELT 三表同时间戳下载、字节与 MD5、ZIP CRC、字段数、Parquet 和 DuckDB 查询验证。
+
 ## 文档
 
 - [数学建模定义](docs/01_math_modeling_definition.md)
@@ -66,8 +82,21 @@ GDELT raw / DOC API / BigQuery controlled backfill
 - [开发前验证清单](docs/03_pre_development_validation.md)
 - [执行路线图与里程碑](docs/04_development_plan.md)
 - [GitHub Issue Backlog](docs/05_github_issue_backlog.md)
+- [全球新闻—多市场冻结版研究协议](docs/06_global_news_market_research_protocol.md)
+- [M1 开发前验证运行手册](docs/07_m1_validation_runbook.md)
 
-三份原始设计文档是当前事实基线；后续实现若与设计不一致，必须通过 ADR 或文档变更明确记录原因。
+原始设计文档是工程事实基线；冻结版研究协议和 `config/` 注册表是确认性研究事实基线。后续实现若与其不一致，必须通过 ADR 或显式版本变更记录原因。
+
+## 冻结研究注册表
+
+```text
+config/asset_universe.yaml       103 个资产或代理
+config/hypothesis_registry.yaml  12 个假设族 × 8 个市场组 = 96 个确认性单元
+config/data_source_registry.yaml 数据来源与用途
+config/licence_matrix.yaml       研究、许可和再分发门禁
+```
+
+伦敦贵金属和商品在未取得官方基准许可时只允许使用明确标注的 `PROXY`；交易所或供应商原始市场数据默认不提交到公开仓库。
 
 ## 开发门禁
 
@@ -97,7 +126,7 @@ GDELT sample
 
 ## 建议的首个版本
 
-`v0.1.0-validation`：只交付开发前验证命令、真实样本、诊断报告和 GO/NO-GO 结论。通过后再进入 `v0.2.0-data-foundation`。
+`v0.1.0-validation`：交付开发前验证命令、真实样本、诊断报告和 GO/NO-GO 结论。通过后再进入 `v0.2.0-data-foundation`。
 
 ## 许可证
 
