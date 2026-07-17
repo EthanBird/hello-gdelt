@@ -13,11 +13,17 @@
 - Added support for pre-market, regular, post-market, midday-break, CME maintenance and closed states.
 - Added reaction-start timestamps, cross-midnight CME trading dates, IANA DST handling, explicit holiday snapshots and early-close overrides.
 - Added nine unit tests covering DST, SSE pre-market and lunch break, NYSE Friday post-market, CME Sunday sessions, maintenance, weekend closure, holidays and early closes.
+- Added machine-readable Ruff and mypy CI diagnostics with short-lived workflow artifacts.
+- Resolved inherited strict-lint and NumPy typing failures, and made the quality workflow run on research branches.
 
-### Validation performed before push
+### Validation performed
 
 - Isolated calendar test suite: `9 passed`.
 - Python byte-code compilation of the new calendar module succeeded.
+- GitHub Actions run `29556296797` passed all jobs.
+- Python 3.11: Ruff, strict mypy, full pytest with coverage gate, package build and Hypothesis Lab demo all passed.
+- Python 3.12: Ruff, full pytest with coverage gate, package build and Hypothesis Lab demo all passed.
+- The legacy attention-study workflow also completed, but it is retained only as a regression check and is not the new research target.
 
 ### Known limitations
 
@@ -29,8 +35,8 @@
 
 ### Next highest-priority work
 
-1. Make CI run on the research branch and resolve Ruff/Mypy/Pytest findings.
-2. Add versioned official holiday/special-session snapshot ingestion and hashes.
-3. Build GDELT finance entity aliases, theme definitions and source-domain geography classification.
-4. Implement the first lawful daily-price provider and a nine-benchmark feasibility panel.
-5. Add event-study and local-projection runners with clustered covariance and hierarchical FDR.
+1. Add versioned official holiday/special-session snapshot ingestion and hashes.
+2. Build GDELT finance entity aliases, theme definitions and source-domain geography classification.
+3. Implement the first lawful daily-price provider and a nine-benchmark feasibility panel.
+4. Add event-study and local-projection runners with clustered covariance and hierarchical FDR.
+5. Replace the legacy attention-study CI job with the first global-news market feasibility workflow once the lawful price panel is ready.
