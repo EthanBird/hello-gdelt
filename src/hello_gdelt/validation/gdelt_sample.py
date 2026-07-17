@@ -17,6 +17,7 @@ from hello_gdelt.gdelt.download import (
     extract_single_member_zip,
     fetch_latest_manifest,
 )
+from hello_gdelt.gdelt.gold import build_news_interval_gold
 from hello_gdelt.gdelt.schema import DelimitedValidation, validate_tsv_file
 from hello_gdelt.gdelt.silver import SilverReceipt, project_bronze_to_silver
 
@@ -53,6 +54,9 @@ class GdeltSampleReport:
     datasets: tuple[DatasetSampleResult, ...]
     manifest_url: str | None = None
     transport_security: Literal["HTTPS", "HTTP_FALLBACK", "UNKNOWN"] = "UNKNOWN"
+    gold_path: str | None = None
+    gold_rows: int = 0
+    gold_duckdb_rows: int = 0
     failure: str | None = None
 
     def to_json(self) -> str:
@@ -78,12 +82,22 @@ class GdeltSampleReport:
                 f"{item.bronze_rows}/{item.bronze_duckdb_rows} | "
                 f"{item.silver_rows}/{item.silver_duckdb_rows} |"
             )
+        lines.extend(
+            [
+                "",
+                "## Gold 区间特征",
+                "",
+                f"- 路径：`{self.gold_path or 'NOT_CREATED'}`",
+                f"- 行数：`{self.gold_rows}`",
+                f"- DuckDB 行数：`{self.gold_duckdb_rows}`",
+            ]
+        )
         if self.failure:
             lines.extend(["", "## 失败", "", f"`{self.failure}`"])
         lines.extend(
             [
                 "",
-                "> GO 只表示一个最新 15 分钟三表样本完成下载、校验、Bronze、语义 Silver 与 DuckDB 闭环；不表示历史回填、市场数据或研究假设已经完成。",
+                "> GO 只表示一个最新 15 分钟三表样本完成下载、校验、Bronze、语义 Silver、Gold 区间特征与 DuckDB 闭环；不表示历史回填、市场数据或研究假设已经完成。",
             ]
         )
         return "\n".join(lines) + "\n"
@@ -192,6 +206,10 @@ def run_gdelt_latest_sample(
     manifest_url: str | None = None
     transport_security: Literal["HTTPS", "HTTP_FALLBACK", "UNKNOWN"] = "UNKNOWN"
     results: list[DatasetSampleResult] = []
+    silver_receipts: list[SilverReceipt] = []
+    gold_path: str | None = None
+    gold_rows = 0
+    gold_duckdb_rows = 0
     try:
         with httpx.Client(headers={"User-Agent": user_agent}) as client:
             try:
@@ -278,6 +296,7 @@ def run_gdelt_latest_sample(
                                 "BRONZE_READY",
                                 bronze_path=Path(bronze.parquet_path),
                             )
+                        silver_receipts.append(silver)
                         results.append(
                             _dataset_result(
                                 artifact.dataset,
@@ -301,6 +320,14 @@ def run_gdelt_latest_sample(
                                 error=f"{type(artifact_error).__name__}: {artifact_error}",
                             )
                         raise
+            gold = build_news_interval_gold(tuple(silver_receipts), paths.data)
+            gold_path = gold.gold_path
+            gold_rows = gold.row_count
+            gold_duckdb_rows = _duckdb_row_count(Path(gold.gold_path))
+            if gold_rows != 1 or gold_duckdb_rows != gold_rows:
+                raise RuntimeError(
+                    f"Gold row mismatch: receipt={gold_rows}, duckdb={gold_duckdb_rows}"
+                )
         return GdeltSampleReport(
             generated_at_utc=generated_at,
             gate="GO",
@@ -308,6 +335,9 @@ def run_gdelt_latest_sample(
             datasets=tuple(results),
             manifest_url=manifest_url,
             transport_security=transport_security,
+            gold_path=gold_path,
+            gold_rows=gold_rows,
+            gold_duckdb_rows=gold_duckdb_rows,
         )
     except Exception as exc:
         return GdeltSampleReport(
@@ -317,6 +347,9 @@ def run_gdelt_latest_sample(
             datasets=tuple(results),
             manifest_url=manifest_url,
             transport_security=transport_security,
+            gold_path=gold_path,
+            gold_rows=gold_rows,
+            gold_duckdb_rows=gold_duckdb_rows,
             failure=f"{type(exc).__name__}: {exc}",
         )
 
