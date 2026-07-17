@@ -29,6 +29,7 @@ class DatasetSampleResult:
     extracted_path: str
     downloaded_bytes: int
     archive_md5: str
+    archive_sha256: str
     archive_reused: bool
     sampled_rows: int
     minimum_columns: int
@@ -115,6 +116,7 @@ def _dataset_result(
     extracted_path: Path,
     downloaded_bytes: int,
     archive_md5: str,
+    archive_sha256: str,
     archive_reused: bool,
 ) -> DatasetSampleResult:
     duckdb_rows = _duckdb_row_count(Path(bronze.parquet_path))
@@ -130,6 +132,7 @@ def _dataset_result(
         extracted_path=str(extracted_path.resolve()),
         downloaded_bytes=downloaded_bytes,
         archive_md5=archive_md5,
+        archive_sha256=archive_sha256,
         archive_reused=archive_reused,
         sampled_rows=validation.row_count,
         minimum_columns=validation.minimum_columns,
@@ -227,6 +230,7 @@ def run_gdelt_latest_sample(
                         extracted,
                         receipt.size_bytes,
                         receipt.md5,
+                        receipt.sha256,
                         receipt.reused,
                     )
                 )
