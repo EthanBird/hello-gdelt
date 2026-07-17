@@ -7,6 +7,7 @@ on:
       - "pyproject.toml"
       - "src/hello_gdelt/config.py"
       - "src/hello_gdelt/cli.py"
+      - "src/hello_gdelt/control/**"
       - "src/hello_gdelt/gdelt/**"
       - "src/hello_gdelt/validation/gdelt_sample.py"
 
@@ -35,11 +36,21 @@ jobs:
           --max-download-mb 1500
           --min-free-disk-gb 10
           --allow-insecure-http
-      - name: Upload gate reports
+      - name: Replay latest trio to prove idempotency
+        run: >-
+          hello-gdelt gdelt-sample
+          --root .
+          --sample-rows 10000
+          --max-download-mb 1500
+          --min-free-disk-gb 10
+          --allow-insecure-http
+      - name: Upload gate evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: m1-gdelt-sample-report
-          path: reports/m1_*_report.*
+          path: |
+            reports/m1_*_report.*
+            data/control/*.sqlite3
           if-no-files-found: warn
           retention-days: 14
