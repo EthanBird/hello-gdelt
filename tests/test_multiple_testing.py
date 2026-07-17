@@ -1,3 +1,6 @@
+from dataclasses import replace
+from typing import Literal
+
 import pytest
 
 from hello_gdelt.research.multiple_testing import (
@@ -16,7 +19,7 @@ def result(
     market: str,
     p_value: float,
     estimate: float = 1.0,
-    expected_direction: str = "POSITIVE",
+    expected_direction: Literal["POSITIVE", "NEGATIVE", "TWO_SIDED"] = "POSITIVE",
     economic: bool = True,
     placebo: bool = True,
 ) -> HypothesisTestResult:
@@ -26,7 +29,7 @@ def result(
         market_group=market,
         p_value=p_value,
         estimate=estimate,
-        expected_direction=expected_direction,  # type: ignore[arg-type]
+        expected_direction=expected_direction,
         economic_significance_pass=economic,
         placebo_pass=placebo,
     )
@@ -93,6 +96,4 @@ def test_decision_requires_direction_economic_placebo_and_global_fdr() -> None:
 def test_data_and_licence_gates_override_significance() -> None:
     base = result("H001", family="A", market="US", p_value=0.001)
     adjusted = apply_hierarchical_fdr((base,))[0]
-    assert decide_result(
-        HypothesisTestResult(**{**adjusted.__dict__, "licence_available": False})
-    ) == "LICENCE_BLOCKED"
+    assert decide_result(replace(adjusted, licence_available=False)) == "LICENCE_BLOCKED"
