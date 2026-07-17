@@ -4,6 +4,11 @@ from pathlib import Path
 
 import typer
 
+from hello_gdelt.config import ResourceLimits
+from hello_gdelt.validation.gdelt_sample import (
+    run_gdelt_latest_sample,
+    write_gdelt_sample_report,
+)
 from hello_gdelt.validation.preflight import run_local_preflight, write_report
 
 app = typer.Typer(no_args_is_help=True, help="GDELT observed-world research CLI")
@@ -25,3 +30,28 @@ def preflight(
     typer.echo(f"JSON: {json_path}")
     typer.echo(f"Markdown: {markdown_path}")
     raise typer.Exit(code=0 if report.gate != "NO_GO" else 2)
+
+
+@app.command("gdelt-sample")
+def gdelt_sample(
+    root: Path = typer.Option(Path.cwd(), help="Repository/runtime root"),
+    sample_rows: int = typer.Option(10_000, min=1, max=1_000_000),
+    max_download_mb: int = typer.Option(1_500, min=1, max=20_000),
+    min_free_disk_gb: int = typer.Option(300, min=1),
+) -> None:
+    """Download and validate one real aligned GDELT trio through DuckDB."""
+
+    limits = ResourceLimits(
+        max_download_bytes=max_download_mb * 1_000_000,
+        min_free_disk_bytes=min_free_disk_gb * 1_000_000_000,
+    )
+    report = run_gdelt_latest_sample(
+        root,
+        limits=limits,
+        sample_rows=sample_rows,
+    )
+    json_path, markdown_path = write_gdelt_sample_report(report, root / "reports")
+    typer.echo(report.to_markdown())
+    typer.echo(f"JSON: {json_path}")
+    typer.echo(f"Markdown: {markdown_path}")
+    raise typer.Exit(code=0 if report.gate == "GO" else 2)
