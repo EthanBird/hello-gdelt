@@ -35,17 +35,19 @@ jobs:
           retention-days: 7
       - run: ruff check src tests
       - name: Capture mypy diagnostics
-        if: always()
+        if: ${{ matrix.python-version == '3.11' }}
         run: mypy src/hello_gdelt > mypy-diagnostics.txt 2>&1 || true
       - name: Upload mypy diagnostics
-        if: always()
+        if: ${{ matrix.python-version == '3.11' }}
         uses: actions/upload-artifact@v4
         with:
           name: mypy-diagnostics-${{ matrix.python-version }}
           path: mypy-diagnostics.txt
           if-no-files-found: error
           retention-days: 7
-      - run: mypy src/hello_gdelt
+      - name: Run mypy against minimum Python target
+        if: ${{ matrix.python-version == '3.11' }}
+        run: mypy src/hello_gdelt
       - run: pytest --cov=hello_gdelt --cov-report=term-missing --cov-fail-under=65
       - run: python -m build
       - run: hello-gdelt hypothesis demo --registry /tmp/hypothesis.sqlite --report /tmp/report.md
