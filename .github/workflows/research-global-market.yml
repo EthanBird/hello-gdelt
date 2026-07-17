@@ -2,8 +2,7 @@ name: Research - GDELT Global Market Pilot
 
 on:
   workflow_dispatch:
-  push:
-    branches: ["agent/global-market-study-v1"]
+  pull_request:
     paths:
       - "research/global_market_pilot/**"
       - "configs/research/**"
