@@ -11,6 +11,10 @@ on:
       - "src/hello_gdelt/gdelt/**"
       - "src/hello_gdelt/validation/gdelt_sample.py"
 
+concurrency:
+  group: m1-gdelt-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
