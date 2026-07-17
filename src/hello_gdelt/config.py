@@ -22,7 +22,7 @@ class Paths:
     temp: Path
 
     @classmethod
-    def from_root(cls, root: Path) -> "Paths":
+    def from_root(cls, root: Path) -> Paths:
         resolved = root.expanduser().resolve()
         return cls(
             root=resolved,
